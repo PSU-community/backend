@@ -9,42 +9,41 @@ class IdSchema(BaseModel):
     id: int
 
 
-class SectionAddSchema(BaseModel):
+class SectionCreate(BaseModel):
     name: str
 
 
-class SectionSchema(IdSchema, SectionAddSchema):
+class SectionSchema(IdSchema, SectionCreate):
     ...
 
 
-class SectionThemeAddSchema(BaseModel):
+class SectionThemeCreate(BaseModel):
     section_id: int
     name: str
 
 
-class SectionThemeSchema(IdSchema, SectionThemeAddSchema):
+class SectionThemeSchema(IdSchema, SectionThemeCreate):
     ...
 
 
-class InformationalContentAddSchema(BaseModel):
+class InformationalContentCreate(BaseModel):
     section_id: int
     section_theme_id: int
     name: str
-    file_url: Optional[str]
     content: Optional[str]
     content_type: ContentTypes
 
 
-class InformationalContentSchema(IdSchema, InformationalContentAddSchema):
-    ...
+class InformationalContentSchema(IdSchema, InformationalContentCreate):
+    file_url: Optional[str]
 
 
-class PersonalInformationAddSchema(BaseModel):
+class PersonalInformationCreate(BaseModel):
     informational_content_id: int
     user_id: int
     content_type: PersonalInformationTypes
     content: Optional[str]
 
 
-class PersonalInformationSchema(IdSchema, PersonalInformationAddSchema):
+class PersonalInformationSchema(IdSchema, PersonalInformationCreate):
     ...
