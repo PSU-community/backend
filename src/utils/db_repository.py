@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
-from typing import Any, Type, Unpack
+from typing import Any, Optional, Type, Unpack
 
+from pydantic import BaseModel
 from sqlalchemy import insert, select, delete
+from sqlalchemy.orm import selectinload
 
 from ..database.base import BaseTable
 from ..database.session import async_session_maker
-from ..models.schemas.users import UserSchema
 
 
 class Repository(ABC):
@@ -30,25 +31,31 @@ class Repository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def find_all(self):
+    async def get_all(self):
         raise NotImplementedError
 
 
 class SQLAlchemyRepository(Repository):
     table_model: Type[BaseTable] = None
 
-    async def get_by_id(self, id: int):
-        return await self.get_one(id=id)
+    async def get_by_id(self, id: int, relationship: Optional[Any] = None):
+        return await self.get_one(relationship, id=id)
 
-    async def get_one(self, **filter: Unpack[table_model]) -> table_model | None:
+    async def get_one(self, relationship: Optional[Any] = None, **filter: Unpack[table_model]) -> BaseModel | None:
         async with async_session_maker() as session:
-            result = await session.execute(select(self.table_model).filter_by(**filter))
+            query = select(self.table_model).filter_by(**filter)
+            if relationship is not None:
+                query.options(selectinload(relationship))
+            result = await session.execute(query)
             data = result.scalar_one_or_none()
             return data.to_schema_model() if data else None
 
-    async def get_many(self, **filter: Unpack[table_model]) -> list[table_model]:
+    async def get_many(self, relationship: Optional[Any] = None, **filter: Unpack[table_model]) -> list[BaseModel]:
         async with async_session_maker() as session:
-            result = await session.execute(select(self.table_model).filter_by(**filter))
+            query = select(self.table_model).filter_by(**filter)
+            if relationship is not None:
+                query.options(selectinload(relationship))
+            result = await session.execute(query)
             return [table.to_schema_model() for table in result.scalars().all()]
 
     async def add_one(self, data: dict) -> table_model:
@@ -63,9 +70,11 @@ class SQLAlchemyRepository(Repository):
         async with async_session_maker() as session:
             await session.execute(delete(self.table_model).filter_by(id=id))
 
-    async def find_all(self) -> list[table_model]:
+    async def get_all(self, relationship: Optional[Any] = None) -> list[BaseModel]:
         async with async_session_maker() as session:
-            result = await session.execute(
-                select(self.table_model)
-            )
+            query = select(self.table_model)
+            if relationship:
+                query.options(selectinload(relationship))
+
+            result = await session.execute(query)
             return [table.to_schema_model() for table in result.scalars().all()]

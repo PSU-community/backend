@@ -2,7 +2,7 @@ from typing import Optional, Type
 
 from ..api import auth
 from ..models.schemas.users import UserCreate, UserSchema
-from ..utils.repository import Repository
+from ..utils.db_repository import Repository
 
 
 class UserService:
