@@ -1,7 +1,7 @@
 from typing import Optional
 
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database.base import BaseTable, int_pk, str_128
 from src.models.enums import ContentTypes, PersonalInformationTypes
@@ -34,6 +34,8 @@ class SectionTable(BaseTable):
     id: Mapped[int_pk]
     name: Mapped[str_128]
 
+    themes: Mapped[list["SectionThemesTable"]] = relationship()
+
     def to_schema_model(self):
         return SectionSchema(
             id=self.id,
@@ -47,6 +49,9 @@ class SectionThemesTable(BaseTable):
     id: Mapped[int_pk]
     section_id: Mapped[int] = mapped_column(ForeignKey(SectionTable.id))
     name: Mapped[str_128]
+
+    section: Mapped["SectionTable"] = relationship()
+    contents: Mapped[list["InformationalContentTable"]] = relationship()
 
     def to_schema_model(self):
         return SectionThemeSchema(
@@ -63,9 +68,11 @@ class InformationalContentTable(BaseTable):
     section_id: Mapped[int] = mapped_column(ForeignKey(SectionTable.id))
     section_theme_id: Mapped[int] = mapped_column(ForeignKey(SectionThemesTable.id))
     name: Mapped[str_128]
-    file_url: Mapped[Optional[str_128]]
-    content: Mapped[Optional[str]]
+    file_url: Mapped[str_128]
     content_type: Mapped[ContentTypes]
+
+    section: Mapped["SectionTable"] = relationship()
+    theme: Mapped["SectionThemesTable"] = relationship()
 
     def to_schema_model(self):
         return InformationalContentSchema(
