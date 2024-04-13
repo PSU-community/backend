@@ -32,6 +32,9 @@ class Settings(BaseSettings):
 
     auth_jwt: AuthJTWT = AuthJTWT()
 
+    MEILISEARCH_URL: str
+    MEILISEARCH_MASTER_KEY: str
+
     @property
     def DATABASE_URL(self):
         return f"postgresql+asyncpg://{self.DATABASE_USER}:{self.DATABASE_PASSWORD}@{self.DATABASE_HOST}/{self.DATABASE_NAME}"

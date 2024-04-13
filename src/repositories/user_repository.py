@@ -1,5 +1,5 @@
 from ..models.tables.tables import UserTable
-from ..utils.repository import SQLAlchemyRepository
+from ..utils.db_repository import SQLAlchemyRepository
 
 
 class UserRepository(SQLAlchemyRepository):
