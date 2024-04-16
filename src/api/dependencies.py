@@ -1,10 +1,16 @@
+from typing import Annotated
+
 from fastapi import Depends, Form, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 
 from .auth import TokenData, TokenTypes
 from ..api import auth, exceptions
-from ..models.schemas.users import UserCreate
+from ..models.enums import UserPermissions
+from ..models.schemas.users import UserCreate, UserSchema
+from ..repositories.rusender_repository import RuSenderRepository
+from ..services.content_service import ContentService
+from ..services.email_sender_service import EmailSenderService
 from ..services.user_service import UserService
 from ..repositories.user_repository import UserRepository
 
@@ -15,31 +21,42 @@ def get_user_service():
     return UserService(UserRepository)
 
 
+def get_content_service():
+    return ContentService()
+
+
+def get_email_service():
+    return EmailSenderService(RuSenderRepository())
+
+
 def get_current_token_data(token: str = Depends(oauth2_scheme)):
     try:
         return auth.decode_access_token(token)
     except InvalidTokenError:
-        raise HTTPException(
-            status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid bearer token"
-        )
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid bearer token")
 
 
 def get_current_user(token_type: TokenTypes = TokenTypes.ACCESS):
     async def wrapper(
         service: UserService = Depends(get_user_service),
-        token: TokenData = Depends(get_current_token_data)
+        token: TokenData = Depends(get_current_token_data),
     ):
         if token["type"] != token_type:
             raise exceptions.invalid_token_type
         return await service.get_user(user_id=int(token["sub"]))
+
     return wrapper
+
+
+def get_current_user_from_email_token(token: str, service: UserService):
+    data = get_current_token_data(token)
+    return get_current_user(TokenTypes.EMAIL_VERIFICATION)(service, data)
 
 
 async def validate_auth_user(
     email: str = Form(),
     password: str = Form(),
-    service: UserService = Depends(get_user_service)
+    service: UserService = Depends(get_user_service),
 ):
     user = await service.get_user(email=email)
 
@@ -51,14 +68,49 @@ async def validate_auth_user(
     return user
 
 
-async def validate_user_create(
+async def validate_user_register(
     name: str = Form(),
     email: str = Form(),
     password: str = Form(),
-    user_service: UserService = Depends(get_user_service)
+    user_service: UserService = Depends(get_user_service),
 ):
     user = await user_service.get_user(email=email)
     if user is not None:
         raise exceptions.invalid_credentials
 
-    return UserCreate(name=name, email=email, password=password)
+    return UserCreate(
+        name=name, email=email, password=password
+    )
+
+
+async def validate_user_create(
+    name: str = Form(),
+    email: str = Form(),
+    password: str = Form(),
+    permissions: UserPermissions = Form(),
+    user_service: UserService = Depends(get_user_service),
+):
+    user = await user_service.get_user(email=email)
+    if user is not None:
+        raise exceptions.invalid_credentials
+
+    return UserCreate(
+        name=name, email=email, password=password, permissions=permissions
+    )
+
+
+IUserService = Annotated[UserService, Depends(get_user_service)]
+IContentService = Annotated[ContentService, Depends(get_content_service)]
+ICurrentUser = Annotated[UserSchema, Depends(get_current_user(TokenTypes.ACCESS))]
+
+
+async def get_admin_user(user: ICurrentUser):
+    if not user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="You don't have permissions"
+        )
+
+    return user
+
+
+IAdminUser = Annotated[UserSchema, Depends(get_admin_user)]

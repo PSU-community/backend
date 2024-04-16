@@ -1,5 +1,6 @@
-from .users import router
+from . import users, informational_content
 
 routers = [
-    router,
+    users.router,
+    informational_content.router
 ]

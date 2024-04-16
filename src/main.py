@@ -1,10 +1,9 @@
-
 import os
 import sys
 
 from fastapi import FastAPI
 
-sys.path.insert(1, os.path.join(sys.path[0], '..'))
+sys.path.insert(1, os.path.join(sys.path[0], ".."))
 
 from .api.routers import routers
 

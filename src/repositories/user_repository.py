@@ -1,4 +1,4 @@
-from ..models.tables.tables import UserTable
+from ..models.tables.users import UserTable
 from ..utils.db_repository import SQLAlchemyRepository
 
 

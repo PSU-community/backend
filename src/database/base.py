@@ -9,11 +9,8 @@ str_128 = Annotated[str, 128]
 
 
 class BaseTable(DeclarativeBase):
-    type_annotation_map = {
-        str_128: String(128)
-    }
+    type_annotation_map = {str_128: String(128)}
 
     @abstractmethod
     def to_schema_model(self):
         raise NotImplementedError
-

@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import Enum, IntFlag
 
 
 class ContentTypes(Enum):
@@ -16,3 +16,8 @@ class ContentTypes(Enum):
 class PersonalInformationTypes(Enum):
     BOOKMARK = "BOOKMARK"
     NOTE = "NOTE"
+
+
+class UserPermissions(IntFlag):
+    NONE = 0
+    ADMINISTRATOR = 1 << 0

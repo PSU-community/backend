@@ -5,27 +5,13 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database.base import BaseTable, int_pk, str_128
 from src.models.enums import ContentTypes, PersonalInformationTypes
-from src.models.schemas.users import UserSchema
-from src.models.schemas.informational_contents import SectionSchema, SectionThemeSchema, InformationalContentSchema, PersonalInformationSchema
-
-
-class UserTable(BaseTable):
-    __tablename__ = "users"
-
-    id: Mapped[int_pk]
-    name: Mapped[str_128]
-    email: Mapped[str_128]
-    hashed_password: Mapped[bytes]
-    permissions: Mapped[int]  # TODO: int flag
-
-    def to_schema_model(self):
-        return UserSchema(
-            id=self.id,
-            name=self.name,
-            email=self.email,
-            hashed_password=self.hashed_password,
-            permissions=self.permissions,
-        )
+from src.models.schemas.informational_contents import (
+    SectionSchema,
+    SectionThemeSchema,
+    InformationalContentSchema,
+    PersonalInformationSchema,
+)
+from src.models.tables.users import UserTable
 
 
 class SectionTable(BaseTable):
@@ -47,6 +33,7 @@ class SectionThemesTable(BaseTable):
     __tablename__ = "section_themes"
 
     id: Mapped[int_pk]
+    # Игнор при удалении в случае случайного удаления администратором
     section_id: Mapped[int] = mapped_column(ForeignKey(SectionTable.id))
     name: Mapped[str_128]
 
@@ -65,8 +52,12 @@ class InformationalContentTable(BaseTable):
     __tablename__ = "informational_contents"
 
     id: Mapped[int_pk]
+    # При удалении разделы или темы, сам контент остаётся.
+    # Сделано это в случае случайного удаления.
     section_id: Mapped[int] = mapped_column(ForeignKey(SectionTable.id))
-    section_theme_id: Mapped[int] = mapped_column(ForeignKey(SectionThemesTable.id))
+    section_theme_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey(SectionThemesTable.id)
+    )
     name: Mapped[str_128]
     file_url: Mapped[str_128]
     content_type: Mapped[ContentTypes]
@@ -81,7 +72,6 @@ class InformationalContentTable(BaseTable):
             section_theme_id=self.section_theme_id,
             name=self.name,
             file_url=self.file_url,
-            content=self.content,
             content_type=self.content_type,
         )
 
@@ -90,7 +80,9 @@ class PersonalInformationTable(BaseTable):
     __tablename__ = "personal_information"
 
     id: Mapped[int_pk]
-    informational_content_id: Mapped[int] = mapped_column(ForeignKey(InformationalContentTable.id))
+    informational_content_id: Mapped[int] = mapped_column(
+        ForeignKey(InformationalContentTable.id)
+    )
     user_id: Mapped[int] = mapped_column(ForeignKey(UserTable.id))
     content_type: Mapped[PersonalInformationTypes]
     content: Mapped[Optional[str]]

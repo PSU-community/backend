@@ -2,9 +2,10 @@ from typing import Any, Optional
 
 from ..models.search import Document
 from ..search.client import index
+from ..utils.search_repository import SearchRepository
 
 
-class MeiliSearchRepository:
+class MeiliSearchRepository(SearchRepository):
     @staticmethod
     def add_document(document: Document):
         index.add_documents(document)
@@ -22,14 +23,16 @@ class MeiliSearchRepository:
         default_params = {
             "attributesToCrop": ["content"],
             "attributesToHighlight": ["title", "content"],
-            "cropLength": 7
+            "cropLength": 7,
         }
         if params is not None:
             default_params.update(**params)
 
         result = index.search(query, params)
 
-        hits_map = map(lambda hit_doc: hit_doc.get("_formatted") or hit_doc, result["hits"])
+        hits_map = map(
+            lambda hit_doc: hit_doc.get("_formatted") or hit_doc, result["hits"]
+        )
         return list(hits_map)
 
     @staticmethod

@@ -10,7 +10,7 @@ BASE_DIR = Path(__file__).parent.parent
 class AuthJTWT(BaseModel):
     PRIVATE_KEY_PATH: Path = BASE_DIR / "certs" / "private.pem"
     PUBLIC_KEY_PATH: Path = BASE_DIR / "certs" / "public.pem"
-    algorithm: str = 'RS256'
+    algorithm: str = "RS256"
 
     @cached_property
     def PRIVATE_KEY(self) -> str:
@@ -24,6 +24,8 @@ class AuthJTWT(BaseModel):
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="allow")
 
+    SITE_URL: str
+
     DATABASE_HOST: str
     DATABASE_PORT: str
     DATABASE_USER: str
@@ -34,6 +36,8 @@ class Settings(BaseSettings):
 
     MEILISEARCH_URL: str
     MEILISEARCH_MASTER_KEY: str
+
+    RUSENDER_API_KEY: str
 
     @property
     def DATABASE_URL(self):
