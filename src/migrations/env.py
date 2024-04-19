@@ -4,15 +4,16 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
+import alembic_postgresql_enum
 
 from src.settings import settings
 from src.models.tables.tables import (
-    UserTable,
     SectionTable,
     SectionThemesTable,
     InformationalContentTable,
-    PersonalInformationTable
+    PersonalInformationTable,
 )  # noqa
+from src.models.tables.users import UserTable
 from src.database.base import BaseTable
 
 # this is the Alembic Config object, which provides
@@ -69,7 +70,9 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata, compare_server_default=True
+            connection=connection,
+            target_metadata=target_metadata,
+            compare_server_default=True,
         )
 
         with context.begin_transaction():

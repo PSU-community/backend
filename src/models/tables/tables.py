@@ -2,6 +2,7 @@ from typing import Optional
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.dialects import postgresql
 
 from src.database.base import BaseTable, int_pk, str_128
 from src.models.enums import ContentTypes, PersonalInformationTypes
@@ -60,7 +61,7 @@ class InformationalContentTable(BaseTable):
     )
     name: Mapped[str_128]
     file_url: Mapped[str_128]
-    content_type: Mapped[ContentTypes]
+    content_type: Mapped[ContentTypes] = mapped_column(postgresql.ENUM(ContentTypes))
 
     section: Mapped["SectionTable"] = relationship()
     theme: Mapped["SectionThemesTable"] = relationship()
@@ -84,7 +85,7 @@ class PersonalInformationTable(BaseTable):
         ForeignKey(InformationalContentTable.id)
     )
     user_id: Mapped[int] = mapped_column(ForeignKey(UserTable.id))
-    content_type: Mapped[PersonalInformationTypes]
+    content_type: Mapped[PersonalInformationTypes] = mapped_column(postgresql.ENUM(PersonalInformationTypes))
     content: Mapped[Optional[str]]
 
     def to_schema_model(self):

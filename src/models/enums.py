@@ -1,7 +1,7 @@
 from enum import Enum, IntFlag
 
 
-class ContentTypes(Enum):
+class ContentTypes(str, Enum):
     TEXT = "TEXT"
     IMAGE = "IMAGE"
     VIDEO = "VIDEO"
@@ -13,7 +13,7 @@ class ContentTypes(Enum):
     PDF = "PDF"
 
 
-class PersonalInformationTypes(Enum):
+class PersonalInformationTypes(str, Enum):
     BOOKMARK = "BOOKMARK"
     NOTE = "NOTE"
 
