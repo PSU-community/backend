@@ -71,3 +71,6 @@ certs/
 
 # IDE files
 .idea/
+
+# alembic
+src/migrations/versions/
