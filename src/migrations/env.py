@@ -8,9 +8,9 @@ import alembic_postgresql_enum
 
 from src.settings import settings
 from src.models.tables.tables import (
-    SectionTable,
-    SectionThemesTable,
-    InformationalContentTable,
+    CategoryTable,
+    SubCategoryTable,
+    PostTable,
     PersonalInformationTable,
 )  # noqa
 from src.models.tables.users import UserTable

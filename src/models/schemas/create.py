@@ -5,20 +5,19 @@ from pydantic import BaseModel
 from src.models.enums import ContentTypes, PersonalInformationTypes
 
 
-class SectionCreate(BaseModel):
+class CategoryCreate(BaseModel):
     name: str
 
 
-class SectionThemeCreate(BaseModel):
+class SubCategoryCreate(BaseModel):
     section_id: int
     name: str
 
 
-class InformationalContentCreate(BaseModel):
+class PostCreate(BaseModel):
     section_id: int
     section_theme_id: Optional[int]
-    name: str
-    content_type: ContentTypes
+    content: str
 
 
 class PersonalInformationCreate(BaseModel):

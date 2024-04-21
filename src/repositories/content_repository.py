@@ -1,22 +1,28 @@
+from ..models.schemas.content import CategorySchema, SubCategorySchema
+from ..models.schemas.create import (
+    PostCreate,
+    CategoryCreate,
+    SubCategoryCreate,
+)
 from ..models.tables.tables import (
-    SectionTable,
-    SectionThemesTable,
-    InformationalContentTable,
+    CategoryTable,
+    SubCategoryTable,
+    PostTable,
     PersonalInformationTable,
 )
 from src.utils.abstract.db_repository import SQLAlchemyRepository
 
 
-class SectionRepository(SQLAlchemyRepository):
-    table_model = SectionTable
+class CategoryRepository(SQLAlchemyRepository):
+    table_model = CategoryTable
 
 
-class SectionThemeRepository(SQLAlchemyRepository):
-    table_model = SectionThemesTable
+class SubCategoryRepository(SQLAlchemyRepository):
+    table_model = SubCategoryTable
 
 
-class InformationalContentRepository(SQLAlchemyRepository):
-    table_model = InformationalContentTable
+class PostRepository(SQLAlchemyRepository):
+    table_model = PostTable
 
 
 class PersonalInformationRepository(SQLAlchemyRepository):
@@ -25,7 +31,7 @@ class PersonalInformationRepository(SQLAlchemyRepository):
 
 class ContentRepository:
     def __init__(self):
-        self.section = SectionRepository()
-        self.section_theme = SectionThemeRepository()
-        self.informational_content = InformationalContentRepository()
+        self.category = CategoryRepository()
+        self.subcategory = SubCategoryRepository()
+        self.post = PostRepository()
         self.personal_information = PersonalInformationRepository()

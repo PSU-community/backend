@@ -5,75 +5,87 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects import postgresql
 
 from src.database.base import BaseTable, int_pk, str_128
-from src.models.enums import ContentTypes, PersonalInformationTypes
-from src.models.schemas.informational_contents import (
-    SectionSchema,
-    SectionThemeSchema,
-    InformationalContentSchema,
-    PersonalInformationSchema,
+from src.models.enums import MediaTypes, PersonalInformationTypes
+from src.models.schemas.content import (
+    CategorySchema,
+    SubCategorySchema,
+    PostSchema,
+    PersonalInformationSchema, UploadedFileSchema,
 )
 from src.models.tables.users import UserTable
 
 
-class SectionTable(BaseTable):
-    __tablename__ = "sections"
+class CategoryTable(BaseTable):
+    __tablename__ = "categories"
 
     id: Mapped[int_pk]
     name: Mapped[str_128]
 
-    themes: Mapped[list["SectionThemesTable"]] = relationship()
+    subcategories: Mapped[list["SubCategoryTable"]] = relationship()
 
     def to_schema_model(self):
-        return SectionSchema(
+        return CategorySchema(
             id=self.id,
             name=self.name,
         )
 
 
-class SectionThemesTable(BaseTable):
-    __tablename__ = "section_themes"
+class SubCategoryTable(BaseTable):
+    __tablename__ = "subcategories"
 
     id: Mapped[int_pk]
     # Игнор при удалении в случае случайного удаления администратором
-    section_id: Mapped[int] = mapped_column(ForeignKey(SectionTable.id))
+    section_id: Mapped[int] = mapped_column(ForeignKey(CategoryTable.id))
     name: Mapped[str_128]
 
-    section: Mapped["SectionTable"] = relationship()
-    contents: Mapped[list["InformationalContentTable"]] = relationship()
+    category: Mapped["CategoryTable"] = relationship()
+    # contents: Mapped[list["PostTable"]] = relationship()
 
     def to_schema_model(self):
-        return SectionThemeSchema(
+        return SubCategorySchema(
             id=self.id,
             section_id=self.section_id,
             name=self.name,
         )
 
 
-class InformationalContentTable(BaseTable):
-    __tablename__ = "informational_contents"
+class PostTable(BaseTable):
+    __tablename__ = "posts"
 
     id: Mapped[int_pk]
     # При удалении разделы или темы, сам контент остаётся.
     # Сделано это в случае случайного удаления.
-    section_id: Mapped[int] = mapped_column(ForeignKey(SectionTable.id))
+    section_id: Mapped[int] = mapped_column(ForeignKey(CategoryTable.id))
     section_theme_id: Mapped[Optional[int]] = mapped_column(
-        ForeignKey(SectionThemesTable.id)
+        ForeignKey(SubCategoryTable.id)
     )
-    name: Mapped[str_128]
-    file_url: Mapped[str_128]
-    content_type: Mapped[ContentTypes] = mapped_column(postgresql.ENUM(ContentTypes))
+    content: str
 
-    section: Mapped["SectionTable"] = relationship()
-    theme: Mapped["SectionThemesTable"] = relationship()
+    category: Mapped["CategoryTable"] = relationship()
+    subcategory: Mapped["SubCategoryTable"] = relationship()
 
     def to_schema_model(self):
-        return InformationalContentSchema(
+        return PostSchema(
             id=self.id,
             section_id=self.section_id,
             section_theme_id=self.section_theme_id,
+            content=self.content,
+        )
+
+
+class UploadedFileTable(BaseTable):
+    __tablename__ = "uploaded_files"
+    id: Mapped[int_pk]
+    name: Mapped[str_128]
+    url: Mapped[str_128]
+    type: Mapped[int]
+
+    def to_schema_model(self):
+        return UploadedFileSchema(
+            id=self.id,
             name=self.name,
-            file_url=self.file_url,
-            content_type=self.content_type,
+            url=self.url,
+            type=MediaTypes(self.type),
         )
 
 
@@ -82,7 +94,7 @@ class PersonalInformationTable(BaseTable):
 
     id: Mapped[int_pk]
     informational_content_id: Mapped[int] = mapped_column(
-        ForeignKey(InformationalContentTable.id)
+        ForeignKey(PostTable.id)
     )
     user_id: Mapped[int] = mapped_column(ForeignKey(UserTable.id))
     content_type: Mapped[PersonalInformationTypes] = mapped_column(postgresql.ENUM(PersonalInformationTypes))

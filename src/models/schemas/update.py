@@ -2,6 +2,8 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
+from src.models.enums import UserPermissions
+
 
 class SectionUpdate(BaseModel):
     name: str
@@ -17,3 +19,4 @@ class UserUpdate(BaseModel):
     email: Optional[str] = Field(default=None)
     password: Optional[str] = Field(default=None)
     is_verified: Optional[bool] = Field(default=None)
+    permissions: Optional[UserPermissions] = Field(default=None)

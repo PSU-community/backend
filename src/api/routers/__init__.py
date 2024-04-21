@@ -1,8 +1,8 @@
-from . import users, informational_content, auth, file_storage
+from . import users, content, auth, file_storage
 
 routers = [
     auth.router,
     users.router,
-    informational_content.router,
+    content.router,
     filestorage.router,
 ]

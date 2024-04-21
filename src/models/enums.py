@@ -1,4 +1,4 @@
-from enum import Enum, IntFlag
+from enum import Enum, IntFlag, IntEnum
 
 
 class ContentTypes(str, Enum):
@@ -11,6 +11,14 @@ class ContentTypes(str, Enum):
     TEST = "TEST"
     DIAGRAM = "DIAGRAM"
     PDF = "PDF"
+
+
+class MediaTypes(IntEnum):
+    IMAGE = 1
+    VIDEO = 2
+    AUDIO = 3
+    PRESENTATION = 4
+    PDF = 5
 
 
 class PersonalInformationTypes(str, Enum):
