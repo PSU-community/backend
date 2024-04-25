@@ -1,7 +1,7 @@
 from src.api.auth import create_email_verification_token, create_reset_password_token
 from src.models.schemas.users import UserSchema
 from src.utils.email import build_verification_email, build_recovery_password_mail
-from src.utils.email_sender_repository import EmailSenderRepository
+from src.utils.abstract.email_sender_repository import EmailSenderRepository
 
 
 class EmailSenderService:

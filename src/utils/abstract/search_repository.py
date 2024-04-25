@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Optional
 
-from ..models.search import Document
+from src.models.search import Document
 
 
 class SearchRepository(ABC):

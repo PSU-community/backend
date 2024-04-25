@@ -5,8 +5,8 @@ from pydantic import BaseModel
 from sqlalchemy import insert, select, delete, update
 from sqlalchemy.orm import selectinload
 
-from ..database.base import BaseTable
-from ..database.session import async_session_maker
+from src.database.base import BaseTable
+from src.database.session import async_session_maker
 
 
 class Repository(ABC):

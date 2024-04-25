@@ -67,7 +67,8 @@ async def request_reset_password(email: str, user_service: UserService = Depends
 async def reset_password(token: str):
     ...
 
-@router.post("/sigin")
+
+@router.post("/signin")
 async def signin(user: UserSchema = Depends(validate_auth_user)) -> Token:
     return Token(
         access_token=auth.create_access_token(user.id),

@@ -2,7 +2,7 @@ from typing import Any, Optional
 
 from ..models.search import Document
 from ..search.client import index
-from ..utils.search_repository import SearchRepository
+from src.utils.abstract.search_repository import SearchRepository
 
 
 class MeiliSearchRepository(SearchRepository):

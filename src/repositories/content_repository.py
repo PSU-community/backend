@@ -1,16 +1,10 @@
-from ..models.schemas.informational_contents import SectionSchema, SectionThemeSchema
-from ..models.schemas.create import (
-    InformationalContentCreate,
-    SectionCreate,
-    SectionThemeCreate,
-)
 from ..models.tables.tables import (
     SectionTable,
     SectionThemesTable,
     InformationalContentTable,
     PersonalInformationTable,
 )
-from ..utils.db_repository import SQLAlchemyRepository
+from src.utils.abstract.db_repository import SQLAlchemyRepository
 
 
 class SectionRepository(SQLAlchemyRepository):

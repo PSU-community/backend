@@ -1,7 +1,7 @@
 import requests
 
 from ..models.email import EmailContent
-from ..utils.email_sender_repository import EmailSenderRepository
+from src.utils.abstract.email_sender_repository import EmailSenderRepository
 from ..settings import settings
 
 ENDPOINT = "https://api.beta.rusender.ru/api/v1/external-mails/send"
