@@ -35,10 +35,12 @@ class ContentRepository:
 
     async def get_popular_categories(self):
         async with async_session_maker() as session:
-            query = select(PostTable.category_id, PostTable.category_id, PostTable.views) \
-                .join(CategoryTable, PostTable.category_id == CategoryTable.id) \
-                .join(SubCategoryTable, PostTable.subcategory_id == SubCategoryTable.id) \
-                .order_by(desc(PostTable.views)) \
+            query = (
+                select(PostTable.category_id, PostTable.category_id, PostTable.views)
+                .join(CategoryTable, PostTable.category_id == CategoryTable.id)
+                .join(SubCategoryTable, PostTable.subcategory_id == SubCategoryTable.id)
+                .order_by(desc(PostTable.views))
                 .limit(8)
+            )
             result = await session.execute(query)
             return result.all()

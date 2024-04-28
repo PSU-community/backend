@@ -23,8 +23,7 @@ class PostSchema(IdSchema, PostCreate):
     views: int
 
 
-class PersonalInformationSchema(IdSchema, PersonalInformationCreate):
-    ...
+class PersonalInformationSchema(IdSchema, PersonalInformationCreate): ...
 
 
 class UploadedFileSchema(IdSchema):

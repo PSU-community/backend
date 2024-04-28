@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from fastapi.security import HTTPBearer
 
 from ..auth import TokenTypes
 from ...api import auth
 from ...api.dependencies import (
     get_current_user,
-    get_current_user_from_email_token, get_email_service,
+    get_current_user_from_email_token,
+    get_email_service,
     get_user_service,
     validate_auth_user,
     validate_user_register,
@@ -35,7 +36,11 @@ async def signup(
 
 
 @router.get("/resend/{user_id}")
-async def resend_verification(user_id: int, user_service: UserService = Depends(get_user_service), email_service: EmailSenderService = Depends(get_email_service)):
+async def resend_verification(
+    user_id: int,
+    user_service: UserService = Depends(get_user_service),
+    email_service: EmailSenderService = Depends(get_email_service),
+):
     user = await user_service.get_user(user_id=user_id)
     if user is None:
         raise exceptions.user_not_found
@@ -55,7 +60,11 @@ async def email_verification(
 
 
 @router.get("/resetpass")
-async def request_reset_password(email: str, user_service: UserService = Depends(get_user_service), email_service: EmailSenderService = Depends(get_email_service)):
+async def request_reset_password(
+    email: str,
+    user_service: UserService = Depends(get_user_service),
+    email_service: EmailSenderService = Depends(get_email_service),
+):
     user = await user_service.get_user(email=email)
     if user is None:
         raise exceptions.user_not_found
@@ -64,20 +73,39 @@ async def request_reset_password(email: str, user_service: UserService = Depends
 
 
 @router.post("/resetpass")
-async def reset_password(token: str):
-    ...
+async def reset_password(token: str): ...
 
 
 @router.post("/signin")
-async def signin(user: UserSchema = Depends(validate_auth_user)) -> Token:
-    return Token(
-        access_token=auth.create_access_token(user.id),
-        refresh_token=auth.create_refresh_token(user.id),
+async def signin(
+    response: Response, user: UserSchema = Depends(validate_auth_user)
+) -> Token:
+    access_token = auth.create_access_token(user.id)
+    refresh_token = auth.create_refresh_token(user.id)
+    token = Token(
+        access_token=access_token["token"],
+        refresh_token=refresh_token["token"],
     )
+    response.set_cookie(
+        "access_token", token.access_token, max_age=access_token["max_age"]
+    )
+    response.set_cookie(
+        "refresh_token", token.access_token, max_age=refresh_token["max_age"]
+    )
+
+    return token
 
 
 @router.post("/refresh", response_model_exclude_none=True)
 async def auth_refresh_jwt(
+    response: Response,
     user: UserSchema = Depends(get_current_user(TokenTypes.REFRESH)),
 ) -> Token:
-    return Token(access_token=auth.create_access_token(user.id))
+    access_token = auth.create_access_token(user.id)
+    token = Token(access_token=access_token["token"])
+
+    response.set_cookie(
+        "access_token", token.access_token, max_age=access_token["max_age"]
+    )
+
+    return token

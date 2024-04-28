@@ -11,7 +11,9 @@ from src.models.schemas.content import (
 )
 from src.models.schemas.update import SubCategoryUpdate, CategoryUpdate
 
-router = APIRouter(tags=["Informational content"], dependencies=[Depends(HTTPBearer(auto_error=False))])
+router = APIRouter(
+    tags=["Informational content"], dependencies=[Depends(HTTPBearer(auto_error=False))]
+)
 
 
 @router.get("/popular")
@@ -88,6 +90,10 @@ async def delete_subcategory(
 ):
     return await service.delete_subcategory(subcategory_id)
 
+
+@router.get("/posts")
+async def get_posts(service: IContentService):
+    return await service.get_post()
 
 @router.get("/posts/{post_id}")
 async def get_post(post_id: int, service: IContentService) -> PostSchema:

@@ -20,7 +20,4 @@ def build_recovery_password_mail(jwt_token: str):
     url = build_url(jwt_token)
     message = f"Перейдите по ссылке для сброса пароля: {url}"
 
-    return EmailContent(
-        title="Сброс пароля PsychoSupport",
-        text=message
-    )
+    return EmailContent(title="Сброс пароля PsychoSupport", text=message)

@@ -14,7 +14,7 @@ from ..services.email_sender_service import EmailSenderService
 from ..services.user_service import UserService
 from ..repositories.user_repository import UserRepository
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/signin")
 
 
 def get_user_service():
@@ -78,9 +78,7 @@ async def validate_user_register(
     if user is not None:
         raise exceptions.invalid_credentials
 
-    return UserCreate(
-        name=name, email=email, password=password
-    )
+    return UserCreate(name=name, email=email, password=password)
 
 
 async def validate_user_create(

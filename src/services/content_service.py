@@ -25,10 +25,13 @@ class ContentService:
         self, category_id: int, with_subcategories: bool = True
     ) -> CategorySchema:
         return await self.repository.category.get_by_id(
-            category_id, relationship=CategoryTable.subcategories if with_subcategories else None
+            category_id,
+            relationship=CategoryTable.subcategories if with_subcategories else None,
         )
 
-    async def get_category_list(self, with_subcategories: bool = True) -> list[CategorySchema]:
+    async def get_category_list(
+        self, with_subcategories: bool = True
+    ) -> list[CategorySchema]:
         return await self.repository.category.get_all(
             relationship=CategoryTable.subcategories if with_subcategories else None
         )
@@ -39,7 +42,9 @@ class ContentService:
         )
         # TODO: make with one session
         for subcategory in category_create.subcategories:
-            await self.repository.subcategory.add_one({"category_id": category.id, "name": subcategory})
+            await self.repository.subcategory.add_one(
+                {"category_id": category.id, "name": subcategory}
+            )
 
     async def update_category(self, category_id: int, category_update: CategoryUpdate):
         return await self.repository.category.update_by_id(
@@ -68,6 +73,9 @@ class ContentService:
 
     async def delete_subcategory(self, theme_id: int):
         return await self.repository.subcategory.remove_by_id(theme_id)
+
+    async def get_posts(self) -> list[PostSchema]:
+        return await self.repository.post.get_many()
 
     async def get_post(
         self, *, category_id: int, theme_id: Optional[int] = None

@@ -10,6 +10,9 @@ class UserService:
     def __init__(self, repository_type: Type[Repository]):
         self.repository: Repository = repository_type()
 
+    async def get_users(self) -> list[UserSchema]:
+        return await self.repository.get_many()
+
     async def get_user(
         self, *, user_id: Optional[int] = None, email: Optional[str] = None
     ) -> UserSchema:

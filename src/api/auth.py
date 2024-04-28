@@ -45,15 +45,23 @@ def create_jwt(*, type: TokenTypes, user_id: int, expire_delta: timedelta) -> st
 
 
 def create_access_token(user_id: int):
-    return create_jwt(
-        type=TokenTypes.ACCESS, user_id=user_id, expire_delta=timedelta(minutes=15)
-    )
+    max_age = timedelta(minutes=15)
+    return {
+        "token": create_jwt(
+            type=TokenTypes.ACCESS, user_id=user_id, expire_delta=max_age
+        ),
+        "max_age": max_age,
+    }
 
 
-def create_refresh_token(user_id: int) -> str:
-    return create_jwt(
-        type=TokenTypes.REFRESH, user_id=user_id, expire_delta=timedelta(days=30)
-    )
+def create_refresh_token(user_id: int):
+    max_age = timedelta(days=30)
+    return {
+        "token": create_jwt(
+            type=TokenTypes.REFRESH, user_id=user_id, expire_delta=max_age
+        ),
+        "max_age": max_age,
+    }
 
 
 def create_email_verification_token(user_id: int) -> str:

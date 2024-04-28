@@ -1,8 +1,7 @@
 from fastapi import HTTPException, status
 
 invalid_credentials = HTTPException(
-    status_code=status.HTTP_401_UNAUTHORIZED,
-    detail="Invalid email or password"
+    status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password"
 )
 
 duplicate_user = HTTPException(
@@ -16,8 +15,7 @@ invalid_token_type = HTTPException(
 )
 
 user_not_found = HTTPException(
-    status_code=status.HTTP_404_NOT_FOUND,
-    detail="User with this id was not found"
+    status_code=status.HTTP_404_NOT_FOUND, detail="User with this id was not found"
 )
 
 user_already_verified = HTTPException(

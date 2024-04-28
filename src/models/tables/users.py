@@ -13,7 +13,9 @@ class UserTable(BaseTable):
     name: Mapped[str_128]
     email: Mapped[str_128]
     hashed_password: Mapped[bytes]
-    permissions: Mapped[UserPermissions] = mapped_column(postgresql.ENUM(UserPermissions))
+    permissions: Mapped[UserPermissions] = mapped_column(
+        postgresql.ENUM(UserPermissions)
+    )
     is_verified: Mapped[bool] = mapped_column(default=False)
 
     def to_schema_model(self):

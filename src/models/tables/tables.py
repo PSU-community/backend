@@ -10,7 +10,8 @@ from src.models.schemas.content import (
     CategorySchema,
     SubCategorySchema,
     PostSchema,
-    PersonalInformationSchema, UploadedFileSchema,
+    PersonalInformationSchema,
+    UploadedFileSchema,
 )
 from src.models.tables.users import UserTable
 
@@ -65,7 +66,9 @@ class PostTable(BaseTable):
     category: Mapped["CategoryTable"] = relationship()
     subcategory: Mapped["SubCategoryTable"] = relationship()
 
-    __table_args__ = (UniqueConstraint("category_id", "subcategory_id", name="unique_post"), )
+    __table_args__ = (
+        UniqueConstraint("category_id", "subcategory_id", name="unique_post"),
+    )
 
     def to_schema_model(self):
         return PostSchema(
@@ -97,11 +100,11 @@ class PersonalInformationTable(BaseTable):
     __tablename__ = "personal_information"
 
     id: Mapped[int_pk]
-    informational_content_id: Mapped[int] = mapped_column(
-        ForeignKey(PostTable.id)
-    )
+    informational_content_id: Mapped[int] = mapped_column(ForeignKey(PostTable.id))
     user_id: Mapped[int] = mapped_column(ForeignKey(UserTable.id))
-    content_type: Mapped[PersonalInformationTypes] = mapped_column(postgresql.ENUM(PersonalInformationTypes))
+    content_type: Mapped[PersonalInformationTypes] = mapped_column(
+        postgresql.ENUM(PersonalInformationTypes)
+    )
     content: Mapped[Optional[str]]
 
     def to_schema_model(self):

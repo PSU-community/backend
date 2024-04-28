@@ -17,6 +17,11 @@ __all__ = ("router",)
 router = APIRouter(tags=["Users"], dependencies=[Depends(HTTPBearer(auto_error=False))])
 
 
+@router.get("/users")
+async def get_users(user_service: UserService = Depends(get_user_service)):
+    return await user_service.get_users()
+
+
 @router.post("/users")
 async def create_user(
     admin_user: IAdminUser,

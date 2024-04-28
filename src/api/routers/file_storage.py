@@ -1,4 +1,3 @@
-
 from fastapi import Depends, UploadFile, APIRouter
 from fastapi.responses import FileResponse
 from fastapi.security import HTTPBearer
@@ -21,4 +20,3 @@ async def upload(file: UploadFile):
 @router.get("/file/{name}")
 async def get_file(name: str):
     return FileResponse(await LocalFileStorageRepository.get_file_path(name))
-
