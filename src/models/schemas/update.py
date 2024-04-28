@@ -5,11 +5,11 @@ from pydantic import BaseModel, Field
 from src.models.enums import UserPermissions
 
 
-class SectionUpdate(BaseModel):
+class CategoryUpdate(BaseModel):
     name: str
 
 
-class SectionThemeUpdate(BaseModel):
+class SubCategoryUpdate(BaseModel):
     section_id: int
     name: str
 

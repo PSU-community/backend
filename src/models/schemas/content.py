@@ -10,15 +10,17 @@ from .create import (
 from ..enums import MediaTypes
 
 
-class CategorySchema(IdSchema, CategoryCreate):
-    themes: list["SubCategorySchema"]
+class CategorySchema(IdSchema):
+    name: str
 
 
-class SubCategorySchema(IdSchema, SubCategoryCreate): ...
+class SubCategorySchema(IdSchema):
+    category_id: int
+    name: str
 
 
 class PostSchema(IdSchema, PostCreate):
-    ...
+    views: int
 
 
 class PersonalInformationSchema(IdSchema, PersonalInformationCreate):

@@ -1,10 +1,11 @@
 
-from fastapi import UploadFile, APIRouter
+from fastapi import Depends, UploadFile, APIRouter
 from fastapi.responses import FileResponse
+from fastapi.security import HTTPBearer
 
 from src.repositories.local_file_storage_repository import LocalFileStorageRepository
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(HTTPBearer(auto_error=False))])
 
 # Приложение не должно реализовывать логику хранилища в таком виде,
 # однако мне пофег

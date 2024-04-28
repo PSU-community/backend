@@ -1,16 +1,22 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import HTTPBearer
 from starlette import status
 
 from src.api.dependencies import IAdminUser, IContentService
-from src.models.schemas.create import CategoryCreate, SubCategoryCreate
+from src.models.schemas.create import CategoryCreate, PostCreate, SubCategoryCreate
 from src.models.schemas.content import (
     PostSchema,
     CategorySchema,
     SubCategorySchema,
 )
-from src.models.schemas.update import SectionThemeUpdate, SectionUpdate
+from src.models.schemas.update import SubCategoryUpdate, CategoryUpdate
 
-router = APIRouter(tags=["Informational content"])
+router = APIRouter(tags=["Informational content"], dependencies=[Depends(HTTPBearer(auto_error=False))])
+
+
+@router.get("/popular")
+async def get_popular_categories(service: IContentService):
+    return await service.get_popular_categories()
 
 
 @router.get("/categories")
@@ -40,7 +46,7 @@ async def get_category(category_id: int, service: IContentService) -> CategorySc
 @router.patch("/categories/{category_id}")
 async def update_category(
     category_id: int,
-    category_update: SectionUpdate,
+    category_update: CategoryUpdate,
     service: IContentService,
     user: IAdminUser,
 ):
@@ -59,40 +65,35 @@ async def delete_category(category_id: int, service: IContentService, user: IAdm
     return await service.delete_category(category_id)
 
 
-@router.get("/categories/{category_id}/content")
-async def get_category_content(
-    category_id: int, service: IContentService
-) -> list[PostSchema]:
-    content = await service.get_content_list(category_id=category_id)
-
-    if content:
-        return content
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail="Section with this id was not found",
-    )
-
-
 @router.post("/subcategories")
-async def add_category_theme(
-    theme_create: SubCategoryCreate, service: IContentService, user: IAdminUser
+async def add_category_subcategory(
+    subcategory_create: SubCategoryCreate, service: IContentService, user: IAdminUser
 ) -> SubCategorySchema:
-    return await service.add_category_theme(theme_create)
+    return await service.add_subcategory(subcategory_create)
 
 
 @router.patch("/subcategories/{subcategory_id}")
-async def update_category_theme(
+async def update_subcategory(
     subcategory_id: int,
-    theme_update: SectionThemeUpdate,
+    subcategory_update: SubCategoryUpdate,
     service: IContentService,
     user: IAdminUser,
 ) -> SubCategorySchema:
-    return await service.update_category_theme(subcategory_id, theme_update)
+    return await service.update_subcategory(subcategory_id, subcategory_update)
 
 
 @router.delete("/subcategories/{subcategory_id}")
-async def delete_category_theme(
+async def delete_subcategory(
     subcategory_id: int, service: IContentService, user: IAdminUser
 ):
     return await service.delete_subcategory(subcategory_id)
+
+
+@router.get("/posts/{post_id}")
+async def get_post(post_id: int, service: IContentService) -> PostSchema:
+    return await service.get_post(post_id)
+
+
+@router.post("/posts")
+async def add_post(post_create: PostCreate, service: IContentService, user: IAdminUser):
+    return await service.add_post(post_create)

@@ -1,6 +1,6 @@
 from typing import Optional
 
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects import postgresql
 
@@ -35,7 +35,7 @@ class SubCategoryTable(BaseTable):
 
     id: Mapped[int_pk]
     # Игнор при удалении в случае случайного удаления администратором
-    section_id: Mapped[int] = mapped_column(ForeignKey(CategoryTable.id))
+    category_id: Mapped[int] = mapped_column(ForeignKey(CategoryTable.id))
     name: Mapped[str_128]
 
     category: Mapped["CategoryTable"] = relationship()
@@ -44,7 +44,7 @@ class SubCategoryTable(BaseTable):
     def to_schema_model(self):
         return SubCategorySchema(
             id=self.id,
-            section_id=self.section_id,
+            category_id=self.category_id,
             name=self.name,
         )
 
@@ -55,21 +55,25 @@ class PostTable(BaseTable):
     id: Mapped[int_pk]
     # При удалении разделы или темы, сам контент остаётся.
     # Сделано это в случае случайного удаления.
-    section_id: Mapped[int] = mapped_column(ForeignKey(CategoryTable.id))
-    section_theme_id: Mapped[Optional[int]] = mapped_column(
+    category_id: Mapped[int] = mapped_column(ForeignKey(CategoryTable.id))
+    subcategory_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey(SubCategoryTable.id)
     )
-    content: str
+    content: Mapped[str] = mapped_column(Text)
+    views: Mapped[int] = mapped_column(default=0)
 
     category: Mapped["CategoryTable"] = relationship()
     subcategory: Mapped["SubCategoryTable"] = relationship()
 
+    __table_args__ = (UniqueConstraint("category_id", "subcategory_id", name="unique_post"), )
+
     def to_schema_model(self):
         return PostSchema(
             id=self.id,
-            section_id=self.section_id,
-            section_theme_id=self.section_theme_id,
+            category_id=self.category_id,
+            subcategory_id=self.subcategory_id,
             content=self.content,
+            views=self.views,
         )
 
 

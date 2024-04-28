@@ -7,6 +7,7 @@ from sqlalchemy.orm import selectinload
 
 from src.database.base import BaseTable
 from src.database.session import async_session_maker
+from src.utils.filters import dict_filter_none
 
 
 class Repository(ABC):
@@ -49,7 +50,7 @@ class SQLAlchemyRepository(Repository):
         self, relationship: Optional[Any] = None, **filter: Unpack[table_model]
     ) -> BaseModel | None:
         async with async_session_maker() as session:
-            query = select(self.table_model).filter_by(**filter)
+            query = select(self.table_model).filter_by(**dict_filter_none(filter))
             if relationship is not None:
                 query.options(selectinload(relationship))
             result = await session.execute(query)
@@ -60,7 +61,7 @@ class SQLAlchemyRepository(Repository):
         self, relationship: Optional[Any] = None, **filter: Unpack[table_model]
     ) -> list[BaseModel]:
         async with async_session_maker() as session:
-            query = select(self.table_model).filter_by(**filter)
+            query = select(self.table_model).filter_by(**dict_filter_none(filter))
             if relationship is not None:
                 query.options(selectinload(relationship))
             result = await session.execute(query)

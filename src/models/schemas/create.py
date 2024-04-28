@@ -7,16 +7,17 @@ from src.models.enums import ContentTypes, PersonalInformationTypes
 
 class CategoryCreate(BaseModel):
     name: str
+    subcategories: list[str]
 
 
 class SubCategoryCreate(BaseModel):
-    section_id: int
+    category_id: int
     name: str
 
 
 class PostCreate(BaseModel):
-    section_id: int
-    section_theme_id: Optional[int]
+    category_id: int
+    subcategory_id: Optional[int]
     content: str
 
 

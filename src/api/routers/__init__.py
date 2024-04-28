@@ -4,5 +4,5 @@ routers = [
     auth.router,
     users.router,
     content.router,
-    filestorage.router,
+    file_storage.router,
 ]
