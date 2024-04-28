@@ -15,7 +15,7 @@ router = APIRouter(tags=["Informational content"])
 
 @router.get("/categories")
 async def get_category_list(service: IContentService) -> list[CategorySchema]:
-    return await service.get_category_list(with_themes=True)
+    return await service.get_category_list(with_subcategories=True)
 
 
 @router.post("/categories")
@@ -27,7 +27,7 @@ async def add_category(
 
 @router.get("/categories/{category_id}")
 async def get_category(category_id: int, service: IContentService) -> CategorySchema:
-    category = await service.get_category(category_id, with_themes=True)
+    category = await service.get_category(category_id, with_subcategories=True)
     if category is not None:
         return category
 
@@ -74,25 +74,25 @@ async def get_category_content(
     )
 
 
-@router.post("/themes")
+@router.post("/subcategories")
 async def add_category_theme(
     theme_create: SubCategoryCreate, service: IContentService, user: IAdminUser
 ) -> SubCategorySchema:
     return await service.add_category_theme(theme_create)
 
 
-@router.patch("/themes/{theme_id}")
+@router.patch("/subcategories/{subcategory_id}")
 async def update_category_theme(
-    theme_id: int,
+    subcategory_id: int,
     theme_update: SectionThemeUpdate,
     service: IContentService,
     user: IAdminUser,
 ) -> SubCategorySchema:
-    return await service.update_category_theme(theme_id, theme_update)
+    return await service.update_category_theme(subcategory_id, theme_update)
 
 
-@router.delete("/themes/{theme_id}")
+@router.delete("/subcategories/{subcategory_id}")
 async def delete_category_theme(
-    theme_id: int, service: IContentService, user: IAdminUser
+    subcategory_id: int, service: IContentService, user: IAdminUser
 ):
-    return await service.delete_category_theme(theme_id)
+    return await service.delete_subcategory(subcategory_id)

@@ -1,9 +1,3 @@
-from ..models.schemas.content import CategorySchema, SubCategorySchema
-from ..models.schemas.create import (
-    PostCreate,
-    CategoryCreate,
-    SubCategoryCreate,
-)
 from ..models.tables.tables import (
     CategoryTable,
     SubCategoryTable,
