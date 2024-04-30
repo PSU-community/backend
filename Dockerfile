@@ -26,8 +26,8 @@ COPY --from=poetry-base ${POETRY_VENV} ${POETRY_VENV}
 ENV PATH="${PATH}:${POETRY_VENV}/bin"
 
 # Make a new directory and set it as work dir
-RUN mkdir /app
-WORKDIR /app
+RUN mkdir /backend
+WORKDIR /backend
 
 # Copy all files
 COPY . .

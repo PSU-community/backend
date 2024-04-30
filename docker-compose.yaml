@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3.9"
 services:
   database:
     image: postgres:16
@@ -9,19 +9,22 @@ services:
   meili:
     image: getmeili/meilisearch:v1.7
     container_name: meili
+    volumes:
+      - ./data.ms:/data.ms
+    env_file:
+      - .env-prod
     ports:
       - 7700:7700
 
-  app:
+  backend:
     build:
       context: .
     container_name: backend
-    command: alembic upgrade head; cd src; gunicorn main:app --workers 3 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000
     volumes:
-      - ./:/app
-      - /app/.venv
+      - ./docker/:/backend/docker
     env_file:
       - .env-prod
+    command: /docker/backend.sh
     ports:
       - 1234:8000
     depends_on:
