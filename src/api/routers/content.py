@@ -93,7 +93,8 @@ async def delete_subcategory(
 
 @router.get("/posts")
 async def get_posts(service: IContentService):
-    return await service.get_post()
+    return await service.get_posts()
+
 
 @router.get("/posts/{post_id}")
 async def get_post(post_id: int, service: IContentService) -> PostSchema:
