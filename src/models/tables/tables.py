@@ -8,7 +8,7 @@ from src.database.base import BaseTable, int_pk, str_128
 from src.models.enums import MediaTypes, PersonalInformationTypes
 from src.models.schemas.content import (
     CategorySchema,
-    SubCategorySchema,
+    MediaFileSchema, SubCategorySchema,
     PostSchema,
     PersonalInformationSchema,
     UploadedFileSchema,
@@ -80,19 +80,22 @@ class PostTable(BaseTable):
         )
 
 
-class UploadedFileTable(BaseTable):
-    __tablename__ = "uploaded_files"
+class MediaFileTable(BaseTable):
+    __tablename__ = "media_files"
+
     id: Mapped[int_pk]
     name: Mapped[str_128]
     url: Mapped[str_128]
     type: Mapped[int]
+    json: Mapped[str] = mapped_column(Text)
 
     def to_schema_model(self):
-        return UploadedFileSchema(
+        return MediaFileSchema(
             id=self.id,
             name=self.name,
             url=self.url,
             type=MediaTypes(self.type),
+            json=self.json,
         )
 
 

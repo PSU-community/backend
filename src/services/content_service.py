@@ -2,11 +2,11 @@ from typing import Optional, overload
 
 from src.models.schemas.content import (
     CategorySchema,
-    SubCategorySchema,
+    MediaFileSchema, SubCategorySchema,
     PostSchema,
 )
 from src.models.schemas.create import (
-    PostCreate,
+    CreateMediaSchema, PostCreate,
     CategoryCreate,
     SubCategoryCreate,
 )
@@ -75,7 +75,7 @@ class ContentService:
         return await self.repository.subcategory.remove_by_id(theme_id)
 
     async def get_posts(self) -> list[PostSchema]:
-        return await self.repository.post.get_many()
+        return await self.repository.post.get_all()
 
     async def get_post(
         self, *, category_id: int, theme_id: Optional[int] = None
@@ -92,6 +92,15 @@ class ContentService:
 
     async def get_popular_categories(self):
         return await self.repository.get_popular_categories()
+
+    async def get_media_file_list(self):
+        return await self.repository.media.get_all()
+
+    async def add_media_file(self, media_file: CreateMediaSchema) -> MediaFileSchema:
+        return await self.repository.media.add_one(media_file.model_dump())
+
+    async def delete_media_file(self, media_file_id: int):
+        return await self.repository.media.remove_by_id(media_file_id)
 
     @overload
     def search(self, query: str, /): ...

@@ -3,7 +3,7 @@ from sqlalchemy import desc, select
 from ..database.session import async_session_maker
 from ..models.tables.tables import (
     CategoryTable,
-    SubCategoryTable,
+    MediaFileTable, SubCategoryTable,
     PostTable,
     PersonalInformationTable,
 )
@@ -26,12 +26,17 @@ class PersonalInformationRepository(SQLAlchemyRepository):
     table_model = PersonalInformationTable
 
 
+class MediaRepository(SQLAlchemyRepository):
+    table_model = MediaFileTable
+
+
 class ContentRepository:
     def __init__(self):
         self.category = CategoryRepository()
         self.subcategory = SubCategoryRepository()
         self.post = PostRepository()
         self.personal_information = PersonalInformationRepository()
+        self.media = MediaRepository()
 
     async def get_popular_categories(self):
         async with async_session_maker() as session:

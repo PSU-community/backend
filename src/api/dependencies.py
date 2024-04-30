@@ -1,12 +1,13 @@
 from typing import Annotated
 
-from fastapi import Depends, Form, HTTPException, status
+from fastapi import Depends, Form, HTTPException, status, UploadFile
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 
 from .auth import TokenData, TokenTypes
 from ..api import auth, exceptions
 from ..models.enums import UserPermissions
+from ..models.schemas.create import CreateMediaSchema
 from ..models.schemas.users import UserCreate, UserSchema
 from ..repositories.rusender_repository import RuSenderRepository
 from ..services.content_service import ContentService

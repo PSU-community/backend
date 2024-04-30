@@ -23,10 +23,16 @@ class PostSchema(IdSchema, PostCreate):
     views: int
 
 
-class PersonalInformationSchema(IdSchema, PersonalInformationCreate): ...
+class PersonalInformationSchema(IdSchema, PersonalInformationCreate):
+    ...
 
 
-class UploadedFileSchema(IdSchema):
+class MediaFileSchema(IdSchema):
     name: str
     url: str
     type: MediaTypes
+    json: str
+
+# Закладки (или заметка) к выделененному фрагменту текста
+# Парсинг docx
+# Возможность вставить текстовый документ и ворд и внести как текст

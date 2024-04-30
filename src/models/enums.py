@@ -20,6 +20,8 @@ class MediaTypes(IntEnum):
     PRESENTATION = 4
     PDF = 5
     DIAGRAM = 6
+    TEST = 7
+    FILE = 8
 
 
 class PersonalInformationTypes(str, Enum):

@@ -1,8 +1,8 @@
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-from src.models.enums import ContentTypes, PersonalInformationTypes
+from src.models.enums import ContentTypes, MediaTypes, PersonalInformationTypes
 
 
 class CategoryCreate(BaseModel):
@@ -26,3 +26,14 @@ class PersonalInformationCreate(BaseModel):
     user_id: int
     content_type: PersonalInformationTypes
     content: Optional[str]
+
+
+class RequestMediaSchema(BaseModel):
+    name: str
+    type: MediaTypes
+    json: str
+
+
+class CreateMediaSchema(RequestMediaSchema):
+    url: Optional[str] = Field(defalt=None)
+
