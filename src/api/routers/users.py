@@ -36,3 +36,8 @@ async def create_user(
 @router.get("/users/me")
 async def get_me(user: UserSchema = Depends(get_current_user())) -> BaseUser:
     return user.to_base_user()
+
+
+@router.get("/users/{user_id}")
+async def get_user(user_id: int, user_service: UserService = Depends(get_user_service)):
+    return await user_service.get_user(user_id=user_id)
