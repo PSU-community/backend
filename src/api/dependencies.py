@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import Depends, Form, HTTPException, status, UploadFile
+from fastapi import Cookie, Depends, Form, HTTPException, status, UploadFile
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 
@@ -15,7 +15,7 @@ from ..services.email_sender_service import EmailSenderService
 from ..services.user_service import UserService
 from ..repositories.user_repository import UserRepository
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/signin")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/signin", auto_error=False)
 
 
 def get_user_service():
@@ -30,11 +30,22 @@ def get_email_service():
     return EmailSenderService(RuSenderRepository())
 
 
-def get_current_token_data(token: str = Depends(oauth2_scheme)):
+def get_current_token_data(
+    token: str = Depends(oauth2_scheme),
+    access_token: str = Cookie(default=None),
+    refresh_token: str = Cookie(default=None),
+):
+    _token = token or access_token or refresh_token
+
+    print(f"{token=} | {access_token=} | {refresh_token=}")
+
+    if not _token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
     try:
         return auth.decode_access_token(token)
     except InvalidTokenError:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid bearer token")
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid Bearer token")
 
 
 def get_current_user(token_type: TokenTypes = TokenTypes.ACCESS):
