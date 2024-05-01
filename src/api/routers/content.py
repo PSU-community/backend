@@ -12,7 +12,7 @@ from src.models.schemas.content import (
 from src.models.schemas.update import SubCategoryUpdate, CategoryUpdate
 
 router = APIRouter(
-    tags=["Informational content"], dependencies=[Depends(HTTPBearer(auto_error=False))]
+    tags=["Informational content"]
 )
 
 
