@@ -11,7 +11,6 @@ from src.models.schemas.content import (
     MediaFileSchema, SubCategorySchema,
     PostSchema,
     PersonalInformationSchema,
-    UploadedFileSchema,
 )
 from src.models.tables.users import UserTable
 
@@ -22,12 +21,17 @@ class CategoryTable(BaseTable):
     id: Mapped[int_pk]
     name: Mapped[str_128]
 
-    subcategories: Mapped[list["SubCategoryTable"]] = relationship()
+    subcategories: Mapped[list["SubCategoryTable"]] = relationship(
+        back_populates="category",
+        # selectinload option don't work idk why
+        lazy="selectin"
+    )
 
     def to_schema_model(self):
         return CategorySchema(
             id=self.id,
             name=self.name,
+            subcategories=[subcategory.to_schema_model() for subcategory in self.subcategories],
         )
 
 
@@ -39,8 +43,9 @@ class SubCategoryTable(BaseTable):
     category_id: Mapped[int] = mapped_column(ForeignKey(CategoryTable.id))
     name: Mapped[str_128]
 
-    category: Mapped["CategoryTable"] = relationship()
-    # contents: Mapped[list["PostTable"]] = relationship()
+    category: Mapped["CategoryTable"] = relationship(
+        back_populates="subcategories"
+    )
 
     def to_schema_model(self):
         return SubCategorySchema(
@@ -63,8 +68,8 @@ class PostTable(BaseTable):
     content: Mapped[str] = mapped_column(Text)
     views: Mapped[int] = mapped_column(default=0)
 
-    category: Mapped["CategoryTable"] = relationship()
-    subcategory: Mapped["SubCategoryTable"] = relationship()
+    category: Mapped["CategoryTable"] = relationship(lazy="selectin")
+    subcategory: Mapped["SubCategoryTable"] = relationship(lazy="selectin")
 
     __table_args__ = (
         UniqueConstraint("category_id", "subcategory_id", name="unique_post"),
@@ -77,6 +82,8 @@ class PostTable(BaseTable):
             subcategory_id=self.subcategory_id,
             content=self.content,
             views=self.views,
+            category=self.category.to_schema_model(),
+            subcategory=self.subcategory.to_schema_model() if self.subcategory is not None else None,
         )
 
 
@@ -87,7 +94,7 @@ class MediaFileTable(BaseTable):
     name: Mapped[str_128]
     url: Mapped[str_128]
     type: Mapped[int]
-    json: Mapped[str] = mapped_column(Text)
+    data: Mapped[str] = mapped_column(Text)
 
     def to_schema_model(self):
         return MediaFileSchema(
@@ -95,7 +102,7 @@ class MediaFileTable(BaseTable):
             name=self.name,
             url=self.url,
             type=MediaTypes(self.type),
-            json=self.json,
+            data=self.data,
         )
 
 

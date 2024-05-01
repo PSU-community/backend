@@ -1,17 +1,13 @@
 from typing import Optional
 
+from pydantic import Field
+
 from .base import IdSchema
 from .create import (
     PostCreate,
     PersonalInformationCreate,
-    CategoryCreate,
-    SubCategoryCreate,
 )
 from ..enums import MediaTypes
-
-
-class CategorySchema(IdSchema):
-    name: str
 
 
 class SubCategorySchema(IdSchema):
@@ -19,8 +15,15 @@ class SubCategorySchema(IdSchema):
     name: str
 
 
+class CategorySchema(IdSchema):
+    name: str
+    subcategories: Optional[list[SubCategorySchema]] = None
+
+
 class PostSchema(IdSchema, PostCreate):
     views: int
+    category: CategorySchema
+    subcategory: Optional[SubCategorySchema] = Field(default=None)
 
 
 class PersonalInformationSchema(IdSchema, PersonalInformationCreate):
@@ -31,7 +34,7 @@ class MediaFileSchema(IdSchema):
     name: str
     url: str
     type: MediaTypes
-    json: str
+    data: str
 
 # Закладки (или заметка) к выделененному фрагменту текста
 # Парсинг docx
