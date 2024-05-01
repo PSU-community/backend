@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta, timezone
+
 from fastapi import APIRouter, Depends, Response
 from fastapi.security import HTTPBearer
 
@@ -86,11 +88,22 @@ async def signin(
         access_token=access_token["token"],
         refresh_token=refresh_token["token"],
     )
+
     response.set_cookie(
-        "access_token", token.access_token, max_age=access_token["max_age"]
+        "access_token",
+        token.access_token,
+        max_age=refresh_token["max_age"],
+        secure=True,
+        samesite="none",
+        httponly=True
     )
     response.set_cookie(
-        "refresh_token", token.access_token, max_age=refresh_token["max_age"]
+        "refresh_token",
+        token.refresh_token,
+        max_age=refresh_token["max_age"],
+        secure=True,
+        samesite="none",
+        httponly=True
     )
 
     return token
