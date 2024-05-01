@@ -17,11 +17,11 @@ router = APIRouter(
 
 
 @router.get("/popular")
-async def get_popular_categories(service: IContentService):
+async def get_popular_categories(service: IContentService) -> list[PostSchema]:
     return await service.get_popular_categories()
 
 
-@router.get("/categories")
+@router.get("/categories", response_model_exclude_none=True)
 async def get_category_list(service: IContentService) -> list[CategorySchema]:
     return await service.get_category_list(with_subcategories=True)
 
