@@ -31,7 +31,7 @@ class PersonalInformationCreate(BaseModel):
 class RequestMediaSchema(BaseModel):
     name: str
     type: MediaTypes
-    json: str
+    data: str
 
 
 class CreateMediaSchema(RequestMediaSchema):
