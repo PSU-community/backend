@@ -15,9 +15,9 @@ router = APIRouter(dependencies=[Depends(HTTPBearer(auto_error=False))])
 @router.post("/media")
 async def upload_media_file(
     service: IContentService,
+    user: IAdminUser,
     file: Optional[UploadFile] = None,
     payload_json: RequestMediaSchema = Form(),
-    user: IAdminUser,
 ) -> MediaFileSchema:
     create_media = CreateMediaSchema(**payload_json.model_dump())
 
