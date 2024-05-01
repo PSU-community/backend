@@ -43,7 +43,7 @@ def get_current_token_data(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
     try:
-        return auth.decode_access_token(token)
+        return auth.decode_access_token(_token)
     except InvalidTokenError:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid Bearer token")
 
