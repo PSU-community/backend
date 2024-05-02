@@ -67,10 +67,9 @@ __pypackages__/
 
 # Enviroment files
 .env
-certs/
 
 # IDE files
 .idea/
 
 # alembic
-src/migrations/versions/
+src/migrations/versions/*.py
