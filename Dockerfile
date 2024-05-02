@@ -9,6 +9,3 @@ COPY . .
 
 #COPY pyproject.toml .
 RUN pip install -e .
-
-# Make scripts executable
-RUN chmod a+x docker/*.sh
