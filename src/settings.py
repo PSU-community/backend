@@ -35,7 +35,7 @@ class Settings(BaseSettings):
     auth_jwt: AuthJTWT = AuthJTWT()
 
     MEILISEARCH_URL: str
-    MEILISEARCH_MASTER_KEY: str
+    MEILI_MASTER_KEY: str
 
     RUSENDER_API_KEY: str
 
