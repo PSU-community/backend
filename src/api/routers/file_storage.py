@@ -1,7 +1,6 @@
 from typing import Optional
 
 from fastapi import Depends, Form, UploadFile, APIRouter
-from fastapi.responses import FileResponse
 from fastapi.security import HTTPBearer
 
 from src.api.dependencies import IAdminUser, IContentService

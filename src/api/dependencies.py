@@ -37,8 +37,6 @@ def get_current_token_data(
 ):
     _token = token or access_token or refresh_token
 
-    print(f"{token=} | {access_token=} | {refresh_token=}")
-
     if not _token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 

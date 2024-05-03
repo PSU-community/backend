@@ -12,10 +12,8 @@ class EmailSenderService:
         token = create_email_verification_token(user.id)
         email = build_verification_email(token)
         data = self.repository.send_email(user.email, email)
-        print("success", data)
 
     def send_reset_password_email(self, user: UserSchema):
         token = create_reset_password_token(user.id)
         email = build_recovery_password_mail(token)
         data = self.repository.send_email(user.email, email)
-        print("success", data)

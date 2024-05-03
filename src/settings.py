@@ -39,9 +39,12 @@ class Settings(BaseSettings):
 
     RUSENDER_API_KEY: str
 
+    FILES_DIR: Path = BASE_DIR / "files"
+
     @property
     def DATABASE_URL(self):
         return f"postgresql+asyncpg://{self.DATABASE_USER}:{self.DATABASE_PASSWORD}@{self.DATABASE_HOST}:{self.DATABASE_PORT}/{self.DATABASE_NAME}"
 
 
 settings = Settings()
+settings.FILES_DIR.mkdir(exist_ok=True)
