@@ -70,6 +70,3 @@ __pypackages__/
 
 # IDE files
 .idea/
-
-# alembic
-src/migrations/versions/*.py
