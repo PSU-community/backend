@@ -10,6 +10,12 @@ from .api.routers import routers
 
 app = FastAPI()
 
+
+@app.get("/")
+def index():
+    return {"Hello": "World"}
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
