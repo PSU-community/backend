@@ -40,7 +40,7 @@ class SubCategoryTable(BaseTable):
 
     id: Mapped[int_pk]
     # Игнор при удалении в случае случайного удаления администратором
-    category_id: Mapped[int] = mapped_column(ForeignKey(CategoryTable.id))
+    category_id: Mapped[int] = mapped_column(ForeignKey(CategoryTable.id, ondelete="CASCADE"))
     name: Mapped[str_128]
 
     category: Mapped["CategoryTable"] = relationship(
@@ -91,16 +91,16 @@ class MediaFileTable(BaseTable):
     __tablename__ = "media_files"
 
     id: Mapped[int_pk]
-    name: Mapped[str_128]
-    url: Mapped[str_128]
     type: Mapped[int]
-    data: Mapped[str] = mapped_column(Text)
+    file_name: Mapped[Optional[str_128]] = mapped_column(default=None)
+    file_url: Mapped[Optional[str_128]] = mapped_column(default=None)
+    data: Mapped[Optional[str]] = mapped_column(Text, default=None)
 
     def to_schema_model(self):
         return MediaFileSchema(
             id=self.id,
-            name=self.name,
-            url=self.url,
+            file_name=self.file_name,
+            file_url=self.file_url,
             type=MediaTypes(self.type),
             data=self.data,
         )

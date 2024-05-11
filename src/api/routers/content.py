@@ -1,7 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile
-from fastapi.security import HTTPBearer
+from typing import Optional
+
+from fastapi import APIRouter, HTTPException
 from starlette import status
 
+from src.api import exceptions
 from src.api.dependencies import IAdminUser, IContentService
 from src.models.schemas.create import CategoryCreate, PostCreate, SubCategoryCreate
 from src.models.schemas.content import (
@@ -9,10 +11,10 @@ from src.models.schemas.content import (
     CategorySchema,
     SubCategorySchema,
 )
-from src.models.schemas.update import SubCategoryUpdate, CategoryUpdate
+from src.models.schemas.update import PostUpdate, SubCategoryUpdate, CategoryUpdate
 
 router = APIRouter(
-    tags=["Informational content"]
+    tags=["Контент"]
 )
 
 
@@ -97,10 +99,34 @@ async def get_posts(service: IContentService):
 
 
 @router.get("/posts/{post_id}")
-async def get_post(post_id: int, service: IContentService) -> PostSchema:
-    return await service.get_post(post_id)
+async def get_post(post_id: int, service: IContentService, user: Optional[IAdminUser] = None) -> PostSchema:
+    post = await service.get_post(post_id=post_id, should_increment_count=user is not None)
+    if post is None:
+        raise exceptions.post_not_found
+    return post
 
 
 @router.post("/posts")
 async def add_post(post_create: PostCreate, service: IContentService, user: IAdminUser):
     return await service.add_post(post_create)
+
+
+@router.patch("/posts/{post_id}")
+async def update_post(post_id: int, post_update: PostUpdate, service: IContentService, user: IAdminUser):
+    return await service.update_post(post_id, post_update)
+
+
+@router.get("/categories/{category_id}/post")
+async def get_category_post(category_id: int, service: IContentService):
+    post = await service.get_post(category_id=category_id)
+    if post is None:
+        raise exceptions.post_not_found
+    return post
+
+
+@router.get("/subcategories/{subcategory_id}/post")
+async def get_subcategory_post(subcategory_id: int, service: IContentService):
+    post = await service.get_post(subcategory_id=subcategory_id)
+    if post is None:
+        raise exceptions.post_not_found
+    return post

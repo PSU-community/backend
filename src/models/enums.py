@@ -1,18 +1,6 @@
 from enum import Enum, IntFlag, IntEnum
 
 
-class ContentTypes(str, Enum):
-    TEXT = "TEXT"
-    IMAGE = "IMAGE"
-    VIDEO = "VIDEO"
-    AUDIO = "AUDIO"
-    PRESENTATION = "PRESENTATION"
-    TABLE = "TABLE"
-    TEST = "TEST"
-    DIAGRAM = "DIAGRAM"
-    PDF = "PDF"
-
-
 class MediaTypes(IntEnum):
     IMAGE = 1
     VIDEO = 2

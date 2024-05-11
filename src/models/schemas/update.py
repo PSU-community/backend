@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Any
 
 from pydantic import BaseModel, Field
 
@@ -10,8 +10,12 @@ class CategoryUpdate(BaseModel):
 
 
 class SubCategoryUpdate(BaseModel):
-    section_id: int
+    category_id: int
     name: str
+
+
+class PostUpdate(BaseModel):
+    content: str
 
 
 class UserUpdate(BaseModel):
@@ -20,3 +24,8 @@ class UserUpdate(BaseModel):
     password: Optional[str] = Field(default=None)
     is_verified: Optional[bool] = Field(default=None)
     permissions: Optional[UserPermissions] = Field(default=None)
+
+
+class MediaUpdate(BaseModel):
+    # TODO: overhaul
+    data: Any

@@ -31,11 +31,7 @@ class PersonalInformationSchema(IdSchema, PersonalInformationCreate):
 
 
 class MediaFileSchema(IdSchema):
-    name: str
-    url: str
+    file_name: Optional[str] = Field(default=None)
+    file_url: Optional[str] = Field(default=None)
     type: MediaTypes
-    data: str
-
-# Закладки (или заметка) к выделененному фрагменту текста
-# Парсинг docx
-# Возможность вставить текстовый документ и ворд и внести как текст
+    data: Optional[str] = Field(default=None)

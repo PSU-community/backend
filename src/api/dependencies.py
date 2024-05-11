@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import Cookie, Depends, Form, HTTPException, status, UploadFile
 from fastapi.security import OAuth2PasswordBearer
-from jwt.exceptions import InvalidTokenError
+from jwt.exceptions import InvalidTokenError, ExpiredSignatureError
 
 from .auth import TokenData, TokenTypes
 from ..api import auth, exceptions
@@ -35,15 +35,18 @@ def get_current_token_data(
     access_token: str = Cookie(default=None),
     refresh_token: str = Cookie(default=None),
 ):
+    print(f"{token=}, {access_token=}, {refresh_token=}")
     _token = token or access_token or refresh_token
 
     if not _token:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        raise exceptions.missing_token
 
     try:
         return auth.decode_access_token(_token)
+    except ExpiredSignatureError:
+        raise exceptions.expired_token
     except InvalidTokenError:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid Bearer token")
+        raise exceptions.invalid_token_type
 
 
 def get_current_user(token_type: TokenTypes = TokenTypes.ACCESS):
@@ -52,7 +55,7 @@ def get_current_user(token_type: TokenTypes = TokenTypes.ACCESS):
         token: TokenData = Depends(get_current_token_data),
     ):
         if token["type"] != token_type:
-            raise exceptions.invalid_token_type
+            raise exceptions.invalid_token
         return await service.get_user(user_id=int(token["sub"]))
 
     return wrapper

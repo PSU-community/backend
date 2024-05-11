@@ -1,8 +1,8 @@
-from typing import Optional
+from typing import Optional, Any
 
 from pydantic import BaseModel, Field
 
-from src.models.enums import ContentTypes, MediaTypes, PersonalInformationTypes
+from src.models.enums import MediaTypes, PersonalInformationTypes
 
 
 class CategoryCreate(BaseModel):
@@ -17,7 +17,7 @@ class SubCategoryCreate(BaseModel):
 
 class PostCreate(BaseModel):
     category_id: int
-    subcategory_id: Optional[int]
+    subcategory_id: Optional[int] = Field(default=None)
     content: str
 
 
@@ -29,11 +29,11 @@ class PersonalInformationCreate(BaseModel):
 
 
 class RequestMediaSchema(BaseModel):
-    name: str
+    file_name: Optional[str] = Field(default=None)
     type: MediaTypes
-    data: str
+    data: Optional[Any] = Field(default=None)
 
 
 class CreateMediaSchema(RequestMediaSchema):
-    url: Optional[str] = Field(defalt=None)
+    file_url: Optional[str] = Field(default=None)
 

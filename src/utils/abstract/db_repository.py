@@ -94,7 +94,7 @@ class SQLAlchemyRepository(Repository):
             query = (
                 update(self.table_model)
                 .filter_by(id=id)
-                .values(**data)
+                .values(**dict_filter_none(data))
                 .returning(self.table_model)
             )
             result = await session.execute(query)

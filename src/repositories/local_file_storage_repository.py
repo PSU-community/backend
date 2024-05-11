@@ -1,6 +1,7 @@
 from hashlib import sha1
 
 import aiofiles
+import aiofiles.os
 from fastapi import UploadFile
 
 from src.settings import settings
@@ -19,8 +20,8 @@ class LocalFileStorageRepository:
 
     @staticmethod
     async def delete_file(filename: str):
-        ...
+        await aiofiles.os.remove(settings.FILES_DIR / filename)
 
     @staticmethod
     async def get_file_path(file: str) -> str:
-        return f"D:\\files\\{file}"
+        return settings.FILES_DIR / file

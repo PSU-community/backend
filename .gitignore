@@ -70,3 +70,5 @@ __pypackages__/
 
 # IDE files
 .idea/
+files/*
+test.py
