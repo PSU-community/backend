@@ -31,8 +31,11 @@ async def upload_media(
         create_media.data = json.dumps(create_media.data)
 
     if file is not None:
-        filename = await LocalFileStorageRepository.upload_file(file)
-        create_media.file_url = f"media/name/{filename}"
+        hashed_filename = await LocalFileStorageRepository.upload_file(file)
+        create_media.file_url = f"media/name/{hashed_filename}"
+        names = file.filename.split(".")
+        names.pop()
+        create_media.file_name = ".".join(names)
 
     return await service.add_media_file(create_media)
 
