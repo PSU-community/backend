@@ -8,7 +8,7 @@ sys.path.insert(1, os.path.join(sys.path[0], ".."))
 
 from .api.routers import routers
 
-app = FastAPI()  # root_path="/api/"
+app = FastAPI(root_path="/api/") 
 
 
 @app.get("/")
