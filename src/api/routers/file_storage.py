@@ -32,7 +32,7 @@ async def upload_media(
 
     if file is not None:
         hashed_filename = await LocalFileStorageRepository.upload_file(file)
-        create_media.file_url = f"media/name/{hashed_filename}"
+        create_media.file_url = f"/media/{hashed_filename}"
         names = file.filename.split(".")
         names.pop()
         create_media.file_name = ".".join(names)
