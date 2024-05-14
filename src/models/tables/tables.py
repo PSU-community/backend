@@ -67,9 +67,9 @@ class PostTable(BaseTable):
     __tablename__ = "posts"
 
     id: Mapped[int_pk]
-    category_id: Mapped[int] = mapped_column(ForeignKey(CategoryTable.id), default=None)
+    category_id: Mapped[int] = mapped_column(ForeignKey(CategoryTable.id, ondelete="CASCADE"), default=None)
     subcategory_id: Mapped[Optional[int]] = mapped_column(
-        ForeignKey(SubCategoryTable.id),
+        ForeignKey(SubCategoryTable.id, ondelete="CASCADE"),
         nullable=True,
         default=None
     )
