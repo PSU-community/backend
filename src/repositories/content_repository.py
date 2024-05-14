@@ -39,6 +39,19 @@ class SubCategoryRepository(SQLAlchemyRepository):
 class PostRepository(SQLAlchemyRepository):
     table_model = PostTable
 
+    async def get_one(self, **filter) -> BaseModel | None:
+        async with async_session_maker() as session:
+            query = (
+                select(PostTable)
+                .options(joinedload(PostTable.category))
+                .options(joinedload(PostTable.subcategory))
+                .filter_by(**dict_filter_none(filter))
+            )
+
+            result = await session.execute(query)
+            data = result.scalar_one_or_none()
+            return data.to_schema_model(load_category=True, load_subcategory=True) if data else None
+
 
 class PersonalInformationRepository(SQLAlchemyRepository):
     table_model = PersonalInformationTable
