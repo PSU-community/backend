@@ -1,7 +1,7 @@
 from typing import Any, Unpack
 from pydantic import BaseModel
 from sqlalchemy import desc, select
-from sqlalchemy.orm import selectinload, joinedload, contains_eager
+from sqlalchemy.orm import selectinload, joinedload
 
 from src.utils.filters import dict_filter_none
 
@@ -60,11 +60,13 @@ class ContentRepository:
         async with async_session_maker() as session:
             query = (
                 select(PostTable)
+                .options(joinedload(PostTable.category))
+                .options(joinedload(PostTable.subcategory))
                 .order_by(desc(PostTable.views))
                 .limit(8)
             )
             result = await session.execute(query)
-            return [table.to_schema_model() for table in result.scalars().all()]
+            return [table.to_schema_model(load_category=True, load_subcategory=True) for table in result.scalars().all()]
 
     async def get_categories(self) -> list[CategorySchema]:
         async with async_session_maker() as session:
@@ -75,4 +77,4 @@ class ContentRepository:
             )
 
             result = await session.execute(query)
-            return [table.to_schema_model() for table in result.scalars().all()]
+            return [table.to_schema_model(load_subcategories=True) for table in result.scalars().all()]

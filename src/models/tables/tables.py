@@ -31,12 +31,12 @@ class CategoryTable(BaseTable):
         primaryjoin="and_(CategoryTable.id == PostTable.category_id, PostTable.subcategory_id == None)"
     )
  
-    def to_schema_model(self, *, load_subcategories: bool = True, load_post: bool = True):
+    def to_schema_model(self, *, load_subcategories: bool = False, load_post: bool = False):
         return CategorySchema(
             id=self.id,
             name=self.name,
-            subcategories=[subcategory.to_schema_model(load_category=False) for subcategory in self.subcategories] if load_subcategories and self.subcategories else [],
-            post=self.post.to_schema_model(load_category=False, load_subcategory=False) if load_post and self.post else None,
+            subcategories=[subcategory.to_schema_model(load_post=True) for subcategory in self.subcategories] if load_subcategories and self.subcategories else [],
+            post=self.post.to_schema_model() if load_post and self.post else None,
         )
 
 
@@ -53,13 +53,13 @@ class SubCategoryTable(BaseTable):
     )
     post: Mapped["PostTable"] = relationship(back_populates="subcategory", lazy="noload")
 
-    def to_schema_model(self, *, load_post: bool = True, load_category: bool = True):
+    def to_schema_model(self, *, load_post: bool = False, load_category: bool = False):
         return SubCategorySchema(
             id=self.id,
             category_id=self.category_id,
             name=self.name,
-            category=self.category.to_schema_model(load_subcategories=False, load_post=False) if load_category and self.category else None,
-            post=self.post.to_schema_model(load_category=False, load_subcategory=False) if load_post and self.post else None,
+            category=self.category.to_schema_model() if load_category and self.category else None,
+            post=self.post.to_schema_model() if load_post and self.post else None,
         )
 
 
@@ -76,22 +76,22 @@ class PostTable(BaseTable):
     content: Mapped[str] = mapped_column(Text, default=None)
     views: Mapped[int] = mapped_column(default=0)
 
-    category: Mapped["CategoryTable"] = relationship(back_populates="post", lazy="joined")
-    subcategory: Mapped[Optional["SubCategoryTable"]] = relationship(back_populates="post", lazy="joined")
+    category: Mapped["CategoryTable"] = relationship(back_populates="post", lazy="noload")
+    subcategory: Mapped[Optional["SubCategoryTable"]] = relationship(back_populates="post", lazy="noload")
 
     __table_args__ = (
         UniqueConstraint("category_id", "subcategory_id", name="unique_post"),
     )
 
-    def to_schema_model(self, *, load_category: bool = True, load_subcategory: bool = True):
+    def to_schema_model(self, *, load_category: bool = False, load_subcategory: bool = False):
         return PostSchema(
             id=self.id,
             category_id=self.category_id,
             subcategory_id=self.subcategory_id,
             content=self.content,
             views=self.views,
-            category=self.category.to_schema_model(load_post=False, load_subcategories=False) if load_category and self.category else None,
-            subcategory=self.subcategory.to_schema_model(load_post=False, load_category=False) if load_subcategory and self.subcategory else None
+            category=self.category.to_schema_model() if load_category and self.category else None,
+            subcategory=self.subcategory.to_schema_model() if load_subcategory and self.subcategory else None
         )
 
 
