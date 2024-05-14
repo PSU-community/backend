@@ -16,9 +16,9 @@ class SubCategoryCreate(BaseModel):
 
 
 class PostCreate(BaseModel):
-    category_id: int
+    category_id: Optional[int] = Field(default=None)
     subcategory_id: Optional[int] = Field(default=None)
-    content: str
+    content: Optional[str] = Field(default=None)
 
 
 class PersonalInformationCreate(BaseModel):

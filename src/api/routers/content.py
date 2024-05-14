@@ -1,7 +1,6 @@
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException
-from starlette import status
+from fastapi import APIRouter
 
 from src.api import exceptions
 from src.api.dependencies import IAdminUser, IContentService
@@ -11,6 +10,7 @@ from src.models.schemas.content import (
     CategorySchema,
     SubCategorySchema,
 )
+from src.models.schemas.responses import CategoryResponseSchema
 from src.models.schemas.update import PostUpdate, SubCategoryUpdate, CategoryUpdate
 
 router = APIRouter(
@@ -19,13 +19,17 @@ router = APIRouter(
 
 
 @router.get("/popular")
-async def get_popular_categories(service: IContentService) -> list[PostSchema]:
-    return await service.get_popular_categories()
+async def get_popular_posts(service: IContentService) -> list[PostSchema]:
+    """
+    Получение восьми самых популярных постов
+    """
+    return await service.get_popular_posts()
 
 
 @router.get("/categories", response_model_exclude_none=True)
-async def get_category_list(service: IContentService) -> list[CategorySchema]:
-    return await service.get_category_list(with_subcategories=True)
+async def get_category_list(service: IContentService) -> list[CategoryResponseSchema]:
+    categories = await service.get_category_list()
+    return [CategoryResponseSchema(**category.model_dump()) for category in categories]
 
 
 @router.post("/categories")
@@ -41,10 +45,7 @@ async def get_category(category_id: int, service: IContentService) -> CategorySc
     if category is not None:
         return category
 
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail="Section with this id was not found",
-    )
+    raise exceptions.post_not_found
 
 
 @router.patch("/categories/{category_id}")
@@ -58,15 +59,21 @@ async def update_category(
     if category is not None:
         return category
 
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail="Section with this id was not found",
-    )
+    raise exceptions.subcategory_not_found
 
 
 @router.delete("/categories/{category_id}")
 async def delete_category(category_id: int, service: IContentService, user: IAdminUser):
     return await service.delete_category(category_id)
+
+
+@router.get("/subcategories/{subcategory_id}", response_model_exclude_none=True)
+async def get_subcategory(subcategory_id: int, service: IContentService ):
+    subcategory = await service.get_subcategory(subcategory_id)
+    if subcategory is None:
+        raise exceptions.subcategory_not_found
+    
+    return subcategory
 
 
 @router.post("/subcategories")

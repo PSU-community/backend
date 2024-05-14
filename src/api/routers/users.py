@@ -19,6 +19,7 @@ router = APIRouter(tags=["Users"], dependencies=[Depends(HTTPBearer(auto_error=F
 
 @router.get("/users")
 async def get_users(user_service: UserService = Depends(get_user_service)):
+    """Получение списка пользователей"""
     return await user_service.get_users()
 
 

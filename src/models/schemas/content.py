@@ -13,16 +13,19 @@ from ..enums import MediaTypes
 class SubCategorySchema(IdSchema):
     category_id: int
     name: str
+    category: Optional["CategorySchema"] = Field(default=None)
+    post: Optional["PostSchema"] = Field(default=None)
 
 
 class CategorySchema(IdSchema):
     name: str
-    subcategories: Optional[list[SubCategorySchema]] = None
+    subcategories: Optional[list[SubCategorySchema]] = Field(default=None)
+    post: Optional["PostSchema"] = Field(default=None)
 
 
 class PostSchema(IdSchema, PostCreate):
-    views: int
-    category: CategorySchema
+    views: Optional[int] = Field(default=None)
+    category: Optional[CategorySchema] = Field(default=None)
     subcategory: Optional[SubCategorySchema] = Field(default=None)
 
 

@@ -21,7 +21,10 @@ async def transform_text_file(file: UploadFile, user: IAdminUser):
 
     filename = await LocalFileStorageRepository.upload_file(file)
     file_path = settings.FILES_DIR / filename
-    markdown_text = pypandoc.convert_file(file_path, format="docx", to="gfm")
-    await LocalFileStorageRepository.delete_file(filename)
+    try:
+        markdown_text = pypandoc.convert_file(file_path, format="docx", to="gfm")
+    except:
+        raise exceptions.incorrect_document_file
 
+    await LocalFileStorageRepository.delete_file(filename)
     return markdown_text

@@ -13,7 +13,7 @@ class BaseTable(DeclarativeBase):
     type_annotation_map = {str_128: String(128)}
 
     @abstractmethod
-    def to_schema_model(self) -> BaseModel:
+    def to_schema_model(self, **kwargs: bool) -> BaseModel:
         raise NotImplementedError
 
     def __repr__(self):

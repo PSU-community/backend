@@ -53,6 +53,21 @@ unsupported_file_type = HTTPException(
     detail=ResponseError(code=ResponseErrorCode.UNSUPPORTED_FILE_TYPE)
 )
 
+incorrect_document_file = HTTPException(
+    status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+    detail=ResponseError(code=ResponseErrorCode.INCORRECT_DOCUMENT_FILE)
+)
+
+category_not_found = HTTPException(
+    status_code=status.HTTP_404_NOT_FOUND,
+    detail=ResponseError(code=ResponseErrorCode.CATEGORY_NOT_FOUND)
+)
+
+subcategory_not_found = HTTPException(
+    status_code=status.HTTP_404_NOT_FOUND,
+    detail=ResponseError(code=ResponseErrorCode.SUBCATEGORY_NOT_FOUND)
+)
+
 post_not_found = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
     detail=ResponseError(code=ResponseErrorCode.POST_NOT_FOUND)
