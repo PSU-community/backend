@@ -48,6 +48,10 @@ user_already_verified = HTTPException(
     detail=ResponseError(code=ResponseErrorCode.USER_ALREADY_VERIFIED)
 )
 
+missing_permissions = HTTPException(
+    status_code=status.HTTP_403_FORBIDDEN, detail=ResponseError(code=ResponseErrorCode.MISSING_PERMISSIONS)
+)
+
 unsupported_file_type = HTTPException(
     status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
     detail=ResponseError(code=ResponseErrorCode.UNSUPPORTED_FILE_TYPE)

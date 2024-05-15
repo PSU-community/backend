@@ -1,6 +1,6 @@
 from typing import Any, Unpack
 from pydantic import BaseModel
-from sqlalchemy import desc, select
+from sqlalchemy import desc, insert, select
 from sqlalchemy.orm import selectinload, joinedload
 
 from src.utils.filters import dict_filter_none
@@ -33,11 +33,24 @@ class SubCategoryRepository(SQLAlchemyRepository):
 
             result = await session.execute(query)
             data = result.scalar_one_or_none()
-            return data.to_schema_model(load_post=False) if data else None
+            return data.to_schema_model(load_category=True) if data else None
 
 
 class PostRepository(SQLAlchemyRepository):
     table_model = PostTable
+
+    async def get_post_with_full_nested_data(self, **filter):
+        async with async_session_maker() as session:
+            query = (
+                select(PostTable)
+                .options(joinedload(PostTable.category).selectinload(CategoryTable.subcategories))
+                .options(joinedload(PostTable.subcategory))
+                .filter_by(**dict_filter_none(filter))
+            )
+
+            result = await session.execute(query)
+            data = result.scalar_one_or_none()
+            return data.to_schema_model(load_category=True, load_subcategory=True, load_category_subcategories=True) if data else None
 
     async def get_one(self, **filter) -> BaseModel | None:
         async with async_session_maker() as session:
@@ -51,6 +64,18 @@ class PostRepository(SQLAlchemyRepository):
             result = await session.execute(query)
             data = result.scalar_one_or_none()
             return data.to_schema_model(load_category=True, load_subcategory=True) if data else None
+
+    async def add_one(self, data: dict):
+        async with async_session_maker() as session:
+            result = await session.execute(
+                insert(PostTable)
+                .values(**data)
+                # .returning(PostTable)
+                # .options(joinedload(PostTable.category))
+                # .options(joinedload(PostTable.subcategory))
+            )
+            await session.commit()
+            # return result.scalar_one().to_schema_model(load_category=True, load_subcategory=True)
 
 
 class PersonalInformationRepository(SQLAlchemyRepository):

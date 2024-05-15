@@ -1,7 +1,8 @@
-from typing import TypedDict
+from typing import Optional, TypedDict
 
 
 class Document(TypedDict):
-    id: int
-    title: str
+    post_id: int
+    category_id: int
+    subcategory_id: Optional[int] = None
     content: str

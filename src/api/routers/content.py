@@ -10,20 +10,12 @@ from src.models.schemas.content import (
     CategorySchema,
     SubCategorySchema,
 )
-from src.models.schemas.responses import CategoryResponseSchema
+from src.models.schemas.responses import CategoryResponseSchema, PopularPostSchema
 from src.models.schemas.update import PostUpdate, SubCategoryUpdate, CategoryUpdate
 
 router = APIRouter(
     tags=["Контент"]
 )
-
-
-@router.get("/popular")
-async def get_popular_posts(service: IContentService) -> list[PostSchema]:
-    """
-    Получение восьми самых популярных постов
-    """
-    return await service.get_popular_posts()
 
 
 @router.get("/categories", response_model_exclude_none=True)
@@ -89,8 +81,8 @@ async def update_subcategory(
     subcategory_update: SubCategoryUpdate,
     service: IContentService,
     user: IAdminUser,
-) -> SubCategorySchema:
-    return await service.update_subcategory(subcategory_id, subcategory_update)
+):
+    await service.update_subcategory(subcategory_id, subcategory_update)
 
 
 @router.delete("/subcategories/{subcategory_id}")
@@ -100,14 +92,24 @@ async def delete_subcategory(
     return await service.delete_subcategory(subcategory_id)
 
 
+@router.get("/popular", response_model_exclude_none=True)
+async def get_popular_posts(service: IContentService) -> list[PopularPostSchema]:
+    """
+    Получение восьми самых популярных постов
+    """
+    posts = await service.get_popular_posts()
+    posts_json = [post.model_dump() for post in posts]
+    return [PopularPostSchema(**post) for post in posts_json]
+
+
 @router.get("/posts")
 async def get_posts(service: IContentService):
     return await service.get_posts()
 
 
 @router.get("/posts/{post_id}")
-async def get_post(post_id: int, service: IContentService, user: Optional[IAdminUser] = None) -> PostSchema:
-    post = await service.get_post(post_id=post_id, should_increment_count=user is not None)
+async def get_post(service: IContentService, post_id: int, fetch_all: bool = False,  user: Optional[IAdminUser] = None) -> PostSchema:
+    post = await service.get_post(post_id=post_id, should_increment_count=user is not None, fetch_all=fetch_all)
     if post is None:
         raise exceptions.post_not_found
     return post
@@ -115,7 +117,7 @@ async def get_post(post_id: int, service: IContentService, user: Optional[IAdmin
 
 @router.post("/posts")
 async def add_post(post_create: PostCreate, service: IContentService, user: IAdminUser):
-    return await service.add_post(post_create)
+    await service.add_post(post_create)
 
 
 @router.patch("/posts/{post_id}")

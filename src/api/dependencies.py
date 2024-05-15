@@ -117,9 +117,7 @@ ICurrentUser = Annotated[UserSchema, Depends(get_current_user(TokenTypes.ACCESS)
 
 async def get_admin_user(user: ICurrentUser):
     if not user.is_admin:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="You don't have permissions"
-        )
+        raise exceptions.missing_permissions
 
     return user
 

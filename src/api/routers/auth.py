@@ -78,8 +78,13 @@ async def reset_password(token: str): ...
 
 @router.post("/signin")
 async def signin(
-    response: Response, user: UserSchema = Depends(validate_auth_user)
+    response: Response,
+    as_admin: bool = False,
+    user: UserSchema = Depends(validate_auth_user)
 ) -> Token:
+    if as_admin and not user.is_admin:
+        raise exceptions.missing_permissions
+
     access_token = auth.create_access_token(user.id)
     refresh_token = auth.create_refresh_token(user.id)
     token = Token(

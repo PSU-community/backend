@@ -52,6 +52,7 @@ class ContentService:
         )
 
     async def delete_category(self, category_id: int):
+        # TODO: fetch post and delete it from meili
         return await self.repository.category.remove_by_id(category_id)
 
     async def get_subcategory(self, subcategory_id: int) -> SubCategorySchema:
@@ -66,19 +67,20 @@ class ContentService:
         post: PostSchema = await self.repository.post.get_one(category_id=subcategory.category_id)
         if not post:
             return subcategory
-
+        # TODO: update meili document
         await self.repository.post.update_by_id(post.id, {"subcategory_id": subcategory.id})
 
         return subcategory
 
     async def update_subcategory(
         self, subcategory_id: int, theme_update: SubCategoryUpdate
-    ) -> SubCategorySchema:
+    ):
         await self.repository.subcategory.update_by_id(
             subcategory_id, theme_update.model_dump(exclude_none=True)
         )
 
     async def delete_subcategory(self, subcategory_id: int):
+        # TODO: fetch post and delete it from meili
         return await self.repository.subcategory.remove_by_id(subcategory_id)
 
     async def get_posts(self) -> list[PostSchema]:
@@ -91,22 +93,30 @@ class ContentService:
         category_id:  Optional[int] = None,
         subcategory_id: Optional[int] = None,
         should_increment_count: bool = True,
+        fetch_all: bool = False
     ) -> PostSchema:
         if post_id is None and category_id is None and subcategory_id is None:
             raise exceptions.missing_arguments
 
-        post: PostSchema = await self.repository.post.get_one(
-            id=post_id, category_id=category_id, subcategory_id=subcategory_id
-        )
+        post: PostSchema
+        if fetch_all:
+            post = await self.repository.post.get_post_with_full_nested_data(id=post_id, category_id=category_id, subcategory_id=subcategory_id)
+        else:
+            post = await self.repository.post.get_one(
+                id=post_id, category_id=category_id, subcategory_id=subcategory_id
+            )
+
         if post is not None and should_increment_count:
             # TODO: implement with one session
             await self.repository.post.update_by_id(post.id, {"views": post.views + 1})
         return post
 
     async def add_post(self, post_create: PostCreate):
-        return await self.repository.post.add_one(post_create.model_dump())
+        await self.repository.post.add_one(post_create.model_dump())
+        # self.search.add_document({"id": post.id, "content": post.content, "title": f"{post.category.name}"})
 
     async def update_post(self, post_id: int, post_update: PostUpdate):
+        # TODO: update document's content
         await self.repository.post.update_by_id(post_id, post_update.model_dump())
 
     async def get_popular_posts(self):
@@ -128,12 +138,12 @@ class ContentService:
         return await self.repository.media.remove_by_id(media_file_id)
 
     @overload
-    def search(self, query: str, /): ...
+    def search_posts(self, query: str, /): ...
 
     @overload
-    def search(self, query: str, /, post_ids: list[int]): ...
+    def search_posts(self, query: str, /, post_ids: list[int]): ...
 
-    def search(self, query: str, /, post_id: int = None):
+    def search_posts(self, query: str, /, post_id: int = None):
         if post_id is None:
             return self.search.search(query)
         return self.search.search_in_documents([post_id], query)
