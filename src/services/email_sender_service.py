@@ -8,10 +8,10 @@ class EmailSenderService:
     def __init__(self, repository: EmailSenderRepository):
         self.repository = repository
 
-    def send_verification_email(self, user: UserSchema):
-        token = create_email_verification_token(user.id)
-        email = build_verification_email(token)
-        data = self.repository.send_email(user.email, email)
+    def send_verification_email(self, user_id: int, email: str):
+        token = create_email_verification_token(user_id, email)
+        mail = build_verification_email(token)
+        data = self.repository.send_email(email, mail)
 
     def send_reset_password_email(self, user: UserSchema):
         token = create_reset_password_token(user.id)

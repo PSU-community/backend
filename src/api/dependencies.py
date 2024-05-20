@@ -35,7 +35,6 @@ def get_current_token_data(
     access_token: str = Cookie(default=None),
     refresh_token: str = Cookie(default=None),
 ):
-    print(f"{token=}, {access_token=}, {refresh_token=}")
     _token = token or access_token or refresh_token
 
     if not _token:
@@ -49,21 +48,25 @@ def get_current_token_data(
         raise exceptions.invalid_token_type
 
 
-def get_current_user(token_type: TokenTypes = TokenTypes.ACCESS):
+def get_current_user(token_type: TokenTypes = TokenTypes.ACCESS, required: bool = True):
     async def wrapper(
         service: UserService = Depends(get_user_service),
         token: TokenData = Depends(get_current_token_data),
     ):
         if token["type"] != token_type:
             raise exceptions.invalid_token
-        return await service.get_user(user_id=int(token["sub"]))
+        return await service.get_user(user_id=token["sub"]["user_id"])
 
-    return wrapper
+    if required:
+        return wrapper
+
+    return lambda: None
 
 
-def get_current_user_from_email_token(token: str, service: UserService):
+async def get_current_user_from_email_token(token: str, service: UserService) -> tuple[UserSchema, str]:
     data = get_current_token_data(token)
-    return get_current_user(TokenTypes.EMAIL_VERIFICATION)(service, data)
+    user = await get_current_user(TokenTypes.EMAIL_VERIFICATION)(service, data)
+    return user, data["sub"]["email"]
 
 
 async def validate_auth_user(
@@ -77,6 +80,8 @@ async def validate_auth_user(
         raise exceptions.invalid_credentials
     if not auth.verify_password_hash(password, user.hashed_password):
         raise exceptions.invalid_credentials
+    if not user.is_verified:
+        raise exceptions.user_not_verified
 
     return user
 
@@ -89,7 +94,7 @@ async def validate_user_register(
 ):
     user = await user_service.get_user(email=email)
     if user is not None:
-        raise exceptions.invalid_credentials
+        raise exceptions.duplicate_user
 
     return UserCreate(name=name, email=email, password=password)
 
@@ -123,3 +128,7 @@ async def get_admin_user(user: ICurrentUser):
 
 
 IAdminUser = Annotated[UserSchema, Depends(get_admin_user)]
+
+async def get_user_from_password_token(token: str, service: UserService) -> UserSchema:
+    data = get_current_token_data(token)
+    return await get_current_user(TokenTypes.PASSWORD_RESET)(service, data)

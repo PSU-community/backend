@@ -33,10 +33,10 @@ def verify_password_hash(password: str, hashed_password: bytes) -> bool:
     return bcrypt.checkpw(password.encode(), hashed_password)
 
 
-def create_jwt(*, type: TokenTypes, user_id: int, expire_delta: timedelta) -> str:
+def create_jwt(*, type: TokenTypes, payload: dict, expire_delta: timedelta) -> str:
     payload = {
         "type": type.value,
-        "sub": str(user_id),
+        "sub": payload,
         "exp": datetime.now(timezone.utc) + expire_delta,
     }
     return jwt.encode(
@@ -48,7 +48,7 @@ def create_access_token(user_id: int):
     max_age = timedelta(minutes=15)
     return {
         "token": create_jwt(
-            type=TokenTypes.ACCESS, user_id=user_id, expire_delta=max_age
+            type=TokenTypes.ACCESS, payload={"user_id": user_id}, expire_delta=max_age
         ),
         "max_age": max_age,
     }
@@ -58,25 +58,25 @@ def create_refresh_token(user_id: int):
     max_age = timedelta(days=30)
     return {
         "token": create_jwt(
-            type=TokenTypes.REFRESH, user_id=user_id, expire_delta=max_age
+            type=TokenTypes.REFRESH, payload={"user_id": user_id}, expire_delta=max_age
         ),
         "max_age": max_age,
     }
 
 
-def create_email_verification_token(user_id: int) -> str:
+def create_email_verification_token(user_id: int, email: str) -> str:
     return create_jwt(
         type=TokenTypes.EMAIL_VERIFICATION,
-        user_id=user_id,
-        expire_delta=timedelta(days=1),
+        payload={"user_id": user_id, "email": email},
+        expire_delta=timedelta(minutes=30),
     )
 
 
 def create_reset_password_token(user_id: int) -> str:
     return create_jwt(
         type=TokenTypes.PASSWORD_RESET,
-        user_id=user_id,
-        expire_delta=timedelta(days=1),
+        payload={"user_id": user_id},
+        expire_delta=timedelta(minutes=30),
     )
 
 

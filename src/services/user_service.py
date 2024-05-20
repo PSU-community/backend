@@ -15,7 +15,7 @@ class UserService:
 
     async def get_user(
         self, *, user_id: Optional[int] = None, email: Optional[str] = None
-    ) -> UserSchema:
+    ) -> UserSchema | None:
         if user_id is not None:
             return await self.repository.get_by_id(user_id)
         return await self.repository.get_one(email=email)

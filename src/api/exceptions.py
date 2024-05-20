@@ -48,6 +48,11 @@ user_already_verified = HTTPException(
     detail=ResponseError(code=ResponseErrorCode.USER_ALREADY_VERIFIED)
 )
 
+user_not_verified = HTTPException(
+    status_code=status.HTTP_400_BAD_REQUEST,
+    detail=ResponseError(code=ResponseErrorCode.USER_NOT_VERIFIED)
+)
+
 missing_permissions = HTTPException(
     status_code=status.HTTP_403_FORBIDDEN, detail=ResponseError(code=ResponseErrorCode.MISSING_PERMISSIONS)
 )
@@ -80,4 +85,14 @@ post_not_found = HTTPException(
 missing_arguments = HTTPException(
     status_code=status.HTTP_400_BAD_REQUEST,
     detail=ResponseError(code=ResponseErrorCode.MISSING_ARGUMENTS)
+)
+
+same_email_address = HTTPException(
+    status_code=status.HTTP_400_BAD_REQUEST,
+    detail=ResponseError(code=ResponseErrorCode.SAME_EMAIL_ADDRESS)
+)
+
+email_address_already_taken = HTTPException(
+    status_code=status.HTTP_400_BAD_REQUEST,
+    detail=ResponseError(code=ResponseErrorCode.EMAIL_ADDRESS_ALREADY_TAKEN)
 )

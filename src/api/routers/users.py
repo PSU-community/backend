@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPBearer
 
+from src.models.schemas.update import UserUpdate
+
 from ...api.dependencies import (
     get_current_user,
     get_email_service,
@@ -11,6 +13,7 @@ from ...api.dependencies import (
 from ...models.schemas.users import BaseUser, UserCreate, UserSchema
 from ...services.email_sender_service import EmailSenderService
 from ...services.user_service import UserService
+from .. import exceptions
 
 __all__ = ("router",)
 
@@ -37,6 +40,18 @@ async def create_user(
 @router.get("/users/me")
 async def get_me(user: UserSchema = Depends(get_current_user())) -> BaseUser:
     return user.to_base_user()
+
+
+@router.patch("/users/me/name")
+async def change_user_name(
+    name: str,
+    user: UserSchema = Depends(get_current_user()),
+    user_service: UserService = Depends(get_user_service)
+):
+    if not name:
+        raise exceptions.missing_arguments
+
+    await user_service.update_user(user.id, UserUpdate(name=name))
 
 
 @router.get("/users/{user_id}")

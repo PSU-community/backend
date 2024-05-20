@@ -21,7 +21,7 @@ class PostUpdate(BaseModel):
 class UserUpdate(BaseModel):
     name: Optional[str] = Field(default=None)
     email: Optional[str] = Field(default=None)
-    password: Optional[str] = Field(default=None)
+    hashed_password: Optional[bytes] = Field(default=None)
     is_verified: Optional[bool] = Field(default=None)
     permissions: Optional[UserPermissions] = Field(default=None)
 
