@@ -6,7 +6,7 @@ from sqlalchemy.orm import selectinload, joinedload
 from src.utils.filters import dict_filter_none
 
 from ..database.session import async_session_maker
-from ..models.schemas.content import CategorySchema, PostSchema
+from ..models.schemas.content import CategorySchema, PersonalInformationSchema, PostSchema
 from ..models.tables.tables import (
     CategoryTable,
     MediaFileTable, SubCategoryTable,
@@ -80,6 +80,48 @@ class PostRepository(SQLAlchemyRepository):
 
 class PersonalInformationRepository(SQLAlchemyRepository):
     table_model = PersonalInformationTable
+
+    async def get_all(self) -> list[PersonalInformationSchema]:
+        async with async_session_maker() as session:
+            query = (
+                select(PersonalInformationTable)
+                .options(
+                    joinedload(PersonalInformationTable.post)
+                        .options(joinedload(PostTable.category))
+                        .options(joinedload(PostTable.subcategory))
+                )
+            )
+            response = await session.execute(query)
+            return [table.to_schema_model(load_post=True, load_category=True, load_subcategory=True) for table in response.scalars().all()]
+        
+    async def get_many(self, **filter: Unpack[table_model]) -> list[BaseModel]:
+        async with async_session_maker() as session:
+            query = (
+                select(PersonalInformationTable)
+                .filter_by(**dict_filter_none(filter))
+                .options(
+                    joinedload(PersonalInformationTable.post)
+                        .options(joinedload(PostTable.category))
+                        .options(joinedload(PostTable.subcategory))
+                )
+            )
+            response = await session.execute(query)
+            return [table.to_schema_model(load_post=True, load_category=True, load_subcategory=True) for table in response.scalars().all()]
+        
+    async def get_one(self, **filter: Unpack[table_model]) -> BaseModel | None:
+        async with async_session_maker() as session:
+            query = (
+                select(PersonalInformationTable)
+                .filter_by(**dict_filter_none(filter))
+                .options(
+                    joinedload(PersonalInformationTable.post)
+                        .options(joinedload(PostTable.category))
+                        .options(joinedload(PostTable.subcategory))
+                )
+            )
+            response = await session.execute(query)
+            table = response.scalar_one_or_none()
+            table.to_schema_model(load_post=True, load_category=True, load_subcategory=True) if table else None
 
 
 class MediaRepository(SQLAlchemyRepository):

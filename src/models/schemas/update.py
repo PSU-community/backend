@@ -29,3 +29,7 @@ class UserUpdate(BaseModel):
 class MediaUpdate(BaseModel):
     # TODO: overhaul
     data: Any
+
+
+class UserContentUpdate(BaseModel):
+    content: str

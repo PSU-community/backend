@@ -118,18 +118,21 @@ class PersonalInformationTable(BaseTable):
     __tablename__ = "personal_information"
 
     id: Mapped[int_pk]
-    informational_content_id: Mapped[int] = mapped_column(ForeignKey(PostTable.id))
+    post_id: Mapped[int] = mapped_column(ForeignKey(PostTable.id))
     user_id: Mapped[int] = mapped_column(ForeignKey(UserTable.id))
     content_type: Mapped[PersonalInformationTypes] = mapped_column(
         postgresql.ENUM(PersonalInformationTypes)
     )
-    content: Mapped[Optional[str]]
+    content: Mapped[Optional[str]] = mapped_column(default=None)
 
-    def to_schema_model(self, is_nested: bool = False):
+    post: Mapped["PostTable"] = relationship(lazy="noload")
+
+    def to_schema_model(self, load_post: bool = False, load_category: bool = False, load_subcategory: bool = False):
         return PersonalInformationSchema(
             id=self.id,
-            informational_content_id=self.informational_content_id,
+            post_id=self.post_id,
             user_id=self.user_id,
             content_type=self.content_type,
             content=self.content,
+            post=self.post.to_schema_model(load_category=load_category, load_subcategory=load_subcategory) if load_post else None,
         )

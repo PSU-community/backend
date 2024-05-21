@@ -30,7 +30,8 @@ class PostSchema(IdSchema, PostCreate):
 
 
 class PersonalInformationSchema(IdSchema, PersonalInformationCreate):
-    ...
+    user_id: int
+    post: Optional["PostSchema"] = Field(default=None)
 
 
 class MediaFileSchema(IdSchema):

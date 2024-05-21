@@ -22,10 +22,9 @@ class PostCreate(BaseModel):
 
 
 class PersonalInformationCreate(BaseModel):
-    informational_content_id: int
-    user_id: int
+    post_id: int
     content_type: PersonalInformationTypes
-    content: Optional[str]
+    content: Optional[str] = Field(default=None)
 
 
 class RequestMediaSchema(BaseModel):

@@ -25,6 +25,7 @@ class ResponseErrorCode(IntEnum):
     SUBCATEGORY_NOT_FOUND = 10301
     POST_NOT_FOUND = 10302
     MISSING_ARGUMENTS = 10303
+    NOT_YOUR_CONTENT = 10304
 
 
 class ResponseError(BaseModel):

@@ -1,18 +1,19 @@
 from typing import Optional, overload
 
 from src.api import exceptions
-from src.models.enums import MediaTypes
+from src.models.enums import MediaTypes, PersonalInformationTypes
 from src.models.schemas.content import (
     CategorySchema,
-    MediaFileSchema, SubCategorySchema,
+    MediaFileSchema,
+    PersonalInformationSchema, SubCategorySchema,
     PostSchema,
 )
 from src.models.schemas.create import (
-    CreateMediaSchema, PostCreate,
+    CreateMediaSchema, PersonalInformationCreate, PostCreate,
     CategoryCreate,
     SubCategoryCreate,
 )
-from src.models.schemas.update import MediaUpdate, PostUpdate, SubCategoryUpdate, CategoryUpdate
+from src.models.schemas.update import UserContentUpdate, MediaUpdate, PostUpdate, SubCategoryUpdate, CategoryUpdate
 from src.models.tables.tables import CategoryTable, PostTable
 from src.repositories.content_repository import ContentRepository
 from src.repositories.meili_search_repository import MeiliSearchRepository
@@ -147,3 +148,25 @@ class ContentService:
         if post_id is None:
             return self.search.search(query)
         return self.search.search_in_documents([post_id], query)
+
+
+    async def add_user_content(self, user_id: int, content_create: PersonalInformationCreate):
+        await self.repository.personal_information.add_one({**content_create.model_dump(), "user_id": user_id})
+
+    async def get_user_content_list(self, user_id: int):
+        return await self.repository.personal_information.get_many(user_id=user_id)
+    
+    async def get_user_content_list_by_type(self, user_id: int, type: PersonalInformationTypes):
+        return await self.repository.personal_information.get_many(user_id=user_id, type=type.value)
+    
+    async def get_user_content_list_by_post(self, user_id: int, post_id: int):
+        return await self.repository.personal_information.get_many(user_id=user_id, post_id=post_id)
+
+    async def get_user_content(self, content_id: int) -> PersonalInformationSchema:
+        return await self.repository.personal_information.get_by_id(content_id)
+
+    async def update_user_content(self, content_id: int, content_update: UserContentUpdate):
+        return await self.repository.personal_information.update_by_id(content_id, content_update.model_dump())
+
+    async def delete_user_content(self, content_id: int):
+        return await self.repository.personal_information.remove_by_id(content_id)

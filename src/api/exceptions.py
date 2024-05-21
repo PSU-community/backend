@@ -96,3 +96,8 @@ email_address_already_taken = HTTPException(
     status_code=status.HTTP_400_BAD_REQUEST,
     detail=ResponseError(code=ResponseErrorCode.EMAIL_ADDRESS_ALREADY_TAKEN)
 )
+
+not_your_content = HTTPException(
+    status_code=status.HTTP_400_BAD_REQUEST,
+    detail=ResponseError(code=ResponseErrorCode.NOT_YOUR_CONTENT)
+)
