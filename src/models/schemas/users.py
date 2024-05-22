@@ -15,7 +15,7 @@ class UserSchema(BaseUser):
     hashed_password: bytes
 
     def to_base_user(self):
-        return BaseUser(name=self.name, email=self.email)
+        return BaseUser(name=self.name, email=self.email, is_verified=self.is_verified, permissions=self.permissions)
 
     @property
     def is_admin(self):
