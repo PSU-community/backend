@@ -121,7 +121,7 @@ class PersonalInformationRepository(SQLAlchemyRepository):
             )
             response = await session.execute(query)
             table = response.scalar_one_or_none()
-            table.to_schema_model(load_post=True, load_category=True, load_subcategory=True) if table else None
+            return table.to_schema_model(load_post=True, load_category=True, load_subcategory=True) if table else None
 
 
 class MediaRepository(SQLAlchemyRepository):

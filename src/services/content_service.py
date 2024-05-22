@@ -157,7 +157,7 @@ class ContentService:
         return await self.repository.personal_information.get_many(user_id=user_id)
     
     async def get_user_content_list_by_type(self, user_id: int, type: PersonalInformationTypes):
-        return await self.repository.personal_information.get_many(user_id=user_id, type=type.value)
+        return await self.repository.personal_information.get_many(user_id=user_id, content_type=type.value)
     
     async def get_user_content_list_by_post(self, user_id: int, post_id: int):
         return await self.repository.personal_information.get_many(user_id=user_id, post_id=post_id)
