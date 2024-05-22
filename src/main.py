@@ -1,14 +1,28 @@
+from contextlib import asynccontextmanager
 import os
 import sys
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from src.api.dependencies import get_content_service
+from src.repositories.meili_search_repository import MeiliSearchRepository
+
 sys.path.insert(1, os.path.join(sys.path[0], ".."))
 
 from .api.routers import routers
 
-app = FastAPI(root_path="/api/", title="С тобой | АПИ документация") 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    content_service = get_content_service()
+    posts = await content_service.get_posts()
+    print("Update meili documents")
+    MeiliSearchRepository.update_documents([post.model_dump() for post in posts])
+    yield
+
+
+app = FastAPI( title="С тобой | АПИ документация", lifespan=lifespan) 
 
 
 @app.get("/")

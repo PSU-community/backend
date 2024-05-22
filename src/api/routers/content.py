@@ -33,7 +33,7 @@ async def add_category(
 
 @router.get("/categories/{category_id}")
 async def get_category(category_id: int, service: IContentService) -> CategorySchema:
-    category = await service.get_category(category_id, with_subcategories=True)
+    category = await service.get_category(category_id)
     if category is not None:
         return category
 
@@ -56,7 +56,11 @@ async def update_category(
 
 @router.delete("/categories/{category_id}")
 async def delete_category(category_id: int, service: IContentService, user: IAdminUser):
-    return await service.delete_category(category_id)
+    category = await service.get_category(category_id)
+    if category is None:
+        raise exceptions.category_not_found
+
+    await service.delete_category(category)
 
 
 @router.get("/subcategories/{subcategory_id}", response_model_exclude_none=True)
@@ -89,7 +93,11 @@ async def update_subcategory(
 async def delete_subcategory(
     subcategory_id: int, service: IContentService, user: IAdminUser
 ):
-    return await service.delete_subcategory(subcategory_id)
+    subcategory = await service.get_subcategory(subcategory_id)
+    if not subcategory:
+        raise exceptions.subcategory_not_found
+    
+    await service.delete_subcategory(subcategory)
 
 
 @router.get("/popular", response_model_exclude_none=True)

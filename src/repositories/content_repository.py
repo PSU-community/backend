@@ -19,6 +19,19 @@ from src.utils.abstract.db_repository import SQLAlchemyRepository
 class CategoryRepository(SQLAlchemyRepository):
     table_model = CategoryTable
 
+    async def get_one(self, **filter) -> BaseModel | None:
+        async with async_session_maker() as session:
+            query = (
+                select(CategoryTable)
+                .options(joinedload(CategoryTable.post))
+                .options(selectinload(CategoryTable.subcategories))
+                .filter_by(**dict_filter_none(filter))
+            )
+
+            result = await session.execute(query)
+            data = result.scalar_one_or_none()
+            return data.to_schema_model(load_post=True, load_subcategories=True) if data else None
+
 
 class SubCategoryRepository(SQLAlchemyRepository):
     table_model = SubCategoryTable
@@ -28,12 +41,13 @@ class SubCategoryRepository(SQLAlchemyRepository):
             query = (
                 select(SubCategoryTable)
                 .options(joinedload(SubCategoryTable.category))
+                .options(joinedload(SubCategoryTable.post))
                 .filter_by(**dict_filter_none(filter))
             )
 
             result = await session.execute(query)
             data = result.scalar_one_or_none()
-            return data.to_schema_model(load_category=True) if data else None
+            return data.to_schema_model(load_category=True, load_post=True) if data else None
 
 
 class PostRepository(SQLAlchemyRepository):
@@ -70,12 +84,10 @@ class PostRepository(SQLAlchemyRepository):
             result = await session.execute(
                 insert(PostTable)
                 .values(**data)
-                # .returning(PostTable)
-                # .options(joinedload(PostTable.category))
-                # .options(joinedload(PostTable.subcategory))
+                .returning(PostTable)
             )
             await session.commit()
-            # return result.scalar_one().to_schema_model(load_category=True, load_subcategory=True)
+            return result.scalar_one().to_schema_model()
 
 
 class PersonalInformationRepository(SQLAlchemyRepository):

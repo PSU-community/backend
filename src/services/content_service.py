@@ -25,12 +25,9 @@ class ContentService:
         self.search = MeiliSearchRepository
 
     async def get_category(
-        self, category_id: int, with_subcategories: bool = True
+        self, category_id: int
     ) -> CategorySchema:
-        return await self.repository.category.get_by_id(
-            category_id,
-            relationship=[CategoryTable.subcategories] if with_subcategories else [],
-        )
+        return await self.repository.category.get_by_id(category_id)
 
     async def get_category_list(
         self,
@@ -52,9 +49,10 @@ class ContentService:
             category_id, category_update.model_dump(exclude_none=True)
         )
 
-    async def delete_category(self, category_id: int):
-        # TODO: fetch post and delete it from meili
-        return await self.repository.category.remove_by_id(category_id)
+    async def delete_category(self, category: CategorySchema):
+        await self.repository.category.remove_by_id(category.id)
+        if category.post:
+            self.search.delete_document(category.post.id)
 
     async def get_subcategory(self, subcategory_id: int) -> SubCategorySchema:
         return await self.repository.subcategory.get_by_id(subcategory_id)
@@ -68,8 +66,8 @@ class ContentService:
         post: PostSchema = await self.repository.post.get_one(category_id=subcategory.category_id)
         if not post:
             return subcategory
-        # TODO: update meili document
         await self.repository.post.update_by_id(post.id, {"subcategory_id": subcategory.id})
+        self.search.update_document({"id": post.id, "subcategory_id": subcategory.id})
 
         return subcategory
 
@@ -80,9 +78,10 @@ class ContentService:
             subcategory_id, theme_update.model_dump(exclude_none=True)
         )
 
-    async def delete_subcategory(self, subcategory_id: int):
-        # TODO: fetch post and delete it from meili
-        return await self.repository.subcategory.remove_by_id(subcategory_id)
+    async def delete_subcategory(self, subcategory: SubCategorySchema):
+        await self.repository.subcategory.remove_by_id(subcategory.id)
+        if subcategory.post is not None:
+            self.search.delete_document(subcategory.post.id)
 
     async def get_posts(self) -> list[PostSchema]:
         return await self.repository.post.get_all()
@@ -113,12 +112,17 @@ class ContentService:
         return post
 
     async def add_post(self, post_create: PostCreate):
-        await self.repository.post.add_one(post_create.model_dump())
-        # self.search.add_document({"id": post.id, "content": post.content, "title": f"{post.category.name}"})
+        post = await self.repository.post.add_one(post_create.model_dump())
+        self.search.add_document({
+            "id": post.id, 
+            "content": post.content, 
+            "category_id": post.category_id, 
+            "subcategory_id": post.subcategory_id,
+        })
 
     async def update_post(self, post_id: int, post_update: PostUpdate):
-        # TODO: update document's content
         await self.repository.post.update_by_id(post_id, post_update.model_dump())
+        self.search.update_document({"id": post_id, "content": post_update.content})
 
     async def get_popular_posts(self):
         return await self.repository.get_popular_posts()

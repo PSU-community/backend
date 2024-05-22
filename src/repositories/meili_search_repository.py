@@ -1,18 +1,25 @@
 from typing import Any, Optional
 
 from ..models.search import Document
-from ..search.client import index
+from ..search.client import index, client
 from src.utils.abstract.search_repository import SearchRepository
 
 
 class MeiliSearchRepository(SearchRepository):
     @staticmethod
+    def update_documents(documents: list[Document]):
+        index.add_documents(documents, "id")
+        f = index.get_documents()
+        print(f.results)
+
+    @staticmethod
     def add_document(document: Document):
-        index.add_documents(document)
+        index.add_documents(document, "id")
+        print(client.get_tasks().results)
 
     @staticmethod
     def update_document(updated_document: Document):
-        index.update_documents([updated_document])
+        index.update_documents([updated_document], "id")
 
     @staticmethod
     def delete_document(document_id: int):
@@ -22,13 +29,17 @@ class MeiliSearchRepository(SearchRepository):
     def search(query: str, params: Optional[dict[str, Any]] = None) -> list[Document]:
         default_params = {
             "attributesToCrop": ["content"],
-            "attributesToHighlight": ["title", "content"],
-            "cropLength": 7,
+            "attributesToHighlight": ["content"],
+            "highlightPreTag": "<span class=\"highlight-text\">",
+            "highlightPostTag": "</span>",
+            "cropLength": 10,
         }
         if params is not None:
             default_params.update(**params)
 
-        result = index.search(query, params)
+        result = index.search(query, default_params)
+
+        print(result)
 
         hits_map = map(
             lambda hit_doc: hit_doc.get("_formatted") or hit_doc, result["hits"]

@@ -31,12 +31,12 @@ class CategoryTable(BaseTable):
         primaryjoin="and_(CategoryTable.id == PostTable.category_id, PostTable.subcategory_id == None)"
     )
  
-    def to_schema_model(self, *, load_subcategories: bool = False, load_post: bool = False):
+    def to_schema_model(self, *, load_subcategories: bool = False, load_subcategories_posts: bool = False, load_post: bool = False):
         return CategorySchema(
             id=self.id,
             name=self.name,
-            subcategories=[subcategory.to_schema_model(load_post=True) for subcategory in self.subcategories] if load_subcategories and self.subcategories else None,
-            post=self.post.to_schema_model() if load_post and self.post else None,
+            subcategories=[subcategory.to_schema_model(load_post=load_subcategories_posts) for subcategory in self.subcategories] if load_subcategories and self.subcategories else None,
+            post=self.post.to_schema_model(load_category=False, load_subcategory=False) if load_post and self.post else None,
         )
 
 
