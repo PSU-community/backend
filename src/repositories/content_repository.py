@@ -169,4 +169,4 @@ class ContentRepository:
             )
 
             result = await session.execute(query)
-            return [table.to_schema_model(load_subcategories=True, load_post=True) for table in result.scalars().all()]
+            return [table.to_schema_model(load_subcategories=True, load_subcategories_posts=True, load_post=True) for table in result.scalars().all()]
