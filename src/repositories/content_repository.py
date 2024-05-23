@@ -24,13 +24,13 @@ class CategoryRepository(SQLAlchemyRepository):
             query = (
                 select(CategoryTable)
                 .options(joinedload(CategoryTable.post))
-                .options(selectinload(CategoryTable.subcategories))
+                .options(selectinload(CategoryTable.subcategories).joinedload(SubCategoryTable.post))
                 .filter_by(**dict_filter_none(filter))
             )
 
             result = await session.execute(query)
             data = result.scalar_one_or_none()
-            return data.to_schema_model(load_post=True, load_subcategories=True) if data else None
+            return data.to_schema_model(load_post=True, load_subcategories=True, load_subcategories_posts=True) if data else None
 
 
 class SubCategoryRepository(SQLAlchemyRepository):
@@ -53,18 +53,18 @@ class SubCategoryRepository(SQLAlchemyRepository):
 class PostRepository(SQLAlchemyRepository):
     table_model = PostTable
 
-    async def get_post_with_full_nested_data(self, **filter):
-        async with async_session_maker() as session:
-            query = (
-                select(PostTable)
-                .options(joinedload(PostTable.category).selectinload(CategoryTable.subcategories))
-                .options(joinedload(PostTable.subcategory))
-                .filter_by(**dict_filter_none(filter))
-            )
+    # async def get_post_with_full_nested_data(self, **filter):
+    #     async with async_session_maker() as session:
+    #         query = (
+    #             select(PostTable)
+    #             .options(joinedload(PostTable.category).selectinload(CategoryTable.subcategories).joinedload(SubCategoryTable.post))
+    #             .options(joinedload(PostTable.subcategory))
+    #             .filter_by(**dict_filter_none(filter))
+    #         )
 
-            result = await session.execute(query)
-            data = result.scalar_one_or_none()
-            return data.to_schema_model(load_category=True, load_subcategory=True, load_category_subcategories=True) if data else None
+    #         result = await session.execute(query)
+    #         data = result.scalar_one_or_none()
+    #         return data.to_schema_model(load_category=True, load_subcategory=True, load_category_subcategories=True, load_subcategories_posts=True) if data else None
 
     async def get_one(self, **filter) -> BaseModel | None:
         async with async_session_maker() as session:

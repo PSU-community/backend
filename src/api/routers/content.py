@@ -31,13 +31,14 @@ async def add_category(
     return await service.add_category(category_create)
 
 
-@router.get("/categories/{category_id}")
+@router.get("/categories/{category_id}", response_model_exclude_none=True)
 async def get_category(category_id: int, service: IContentService) -> CategorySchema:
     category = await service.get_category(category_id)
-    if category is not None:
-        return category
+    if category is None:
+        raise exceptions.post_not_found
 
-    raise exceptions.post_not_found
+    return CategoryResponseSchema(**category.model_dump())
+
 
 
 @router.patch("/categories/{category_id}")
@@ -117,7 +118,7 @@ async def get_posts(service: IContentService):
 
 @router.get("/posts/{post_id}")
 async def get_post(service: IContentService, post_id: int, fetch_all: bool = False,  user: Optional[IAdminUser] = None) -> PostSchema:
-    post = await service.get_post(post_id=post_id, should_increment_count=user is not None, fetch_all=fetch_all)
+    post = await service.get_post(post_id=post_id, should_increment_count=user is None, fetch_all=fetch_all)
     if post is None:
         raise exceptions.post_not_found
     return post

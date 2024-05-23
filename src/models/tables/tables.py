@@ -83,14 +83,14 @@ class PostTable(BaseTable):
         UniqueConstraint("category_id", "subcategory_id", name="unique_post"),
     )
 
-    def to_schema_model(self, *, load_category: bool = False, load_subcategory: bool = False, load_category_subcategories: bool = False):
+    def to_schema_model(self, *, load_category: bool = False, load_subcategory: bool = False, load_category_subcategories: bool = False, load_subcategories_posts: bool = False):
         return PostSchema(
             id=self.id,
             category_id=self.category_id,
             subcategory_id=self.subcategory_id,
             content=self.content,
             views=self.views,
-            category=self.category.to_schema_model(load_subcategories=load_category_subcategories) if load_category and self.category else None,
+            category=self.category.to_schema_model(load_subcategories=load_category_subcategories, load_subcategories_posts=load_subcategories_posts) if load_category and self.category else None,
             subcategory=self.subcategory.to_schema_model() if load_subcategory and self.subcategory else None
         )
 

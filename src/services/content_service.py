@@ -64,7 +64,7 @@ class ContentService:
             subcategory_create.model_dump()
         )
         post: PostSchema = await self.repository.post.get_one(category_id=subcategory.category_id)
-        if not post:
+        if not post or post.subcategory_id is not None:
             return subcategory
         await self.repository.post.update_by_id(post.id, {"subcategory_id": subcategory.id})
         self.search.update_document({"id": post.id, "subcategory_id": subcategory.id})
@@ -99,14 +99,15 @@ class ContentService:
             raise exceptions.missing_arguments
 
         post: PostSchema
-        if fetch_all:
-            post = await self.repository.post.get_post_with_full_nested_data(id=post_id, category_id=category_id, subcategory_id=subcategory_id)
-        else:
-            post = await self.repository.post.get_one(
-                id=post_id, category_id=category_id, subcategory_id=subcategory_id
-            )
+        # if fetch_all:
+        #     post = await self.repository.post.get_post_with_full_nested_data(id=post_id, category_id=category_id, subcategory_id=subcategory_id)
+        # else:
+        post = await self.repository.post.get_one(
+            id=post_id, category_id=category_id, subcategory_id=subcategory_id
+        )
 
         if post is not None and should_increment_count:
+            print("INCREMENT", post.views)
             # TODO: implement with one session
             await self.repository.post.update_by_id(post.id, {"views": post.views + 1})
         return post
