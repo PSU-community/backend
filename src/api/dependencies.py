@@ -4,6 +4,8 @@ from fastapi import Cookie, Depends, Form, HTTPException, status, UploadFile
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError, ExpiredSignatureError
 
+from src.services.guide import GuideService
+
 from .auth import TokenData, TokenTypes
 from ..api import auth, exceptions
 from ..models.enums import UserPermissions
@@ -28,6 +30,10 @@ def get_content_service():
 
 def get_email_service():
     return EmailSenderService(RuSenderRepository())
+
+
+def get_guide_service():
+    return GuideService()
 
 
 def get_current_token_data(
@@ -117,6 +123,8 @@ async def validate_user_create(
 
 IUserService = Annotated[UserService, Depends(get_user_service)]
 IContentService = Annotated[ContentService, Depends(get_content_service)]
+GuideServiceDep = Annotated[GuideService, Depends(get_guide_service)]
+
 ICurrentUser = Annotated[UserSchema, Depends(get_current_user(TokenTypes.ACCESS))]
 
 

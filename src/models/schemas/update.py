@@ -33,3 +33,7 @@ class MediaUpdate(BaseModel):
 
 class UserContentUpdate(BaseModel):
     content: str
+
+
+class GuideUpdate(BaseModel):
+    content: str

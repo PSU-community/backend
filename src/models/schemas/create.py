@@ -36,3 +36,7 @@ class RequestMediaSchema(BaseModel):
 class CreateMediaSchema(RequestMediaSchema):
     file_url: Optional[str] = Field(default=None)
 
+
+class GuideCreate(BaseModel):
+    name: str
+    content: str

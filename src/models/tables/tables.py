@@ -1,5 +1,6 @@
 from typing import Optional
 
+from pydantic import BaseModel
 from sqlalchemy import ForeignKey, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects import postgresql
@@ -12,6 +13,7 @@ from src.models.schemas.content import (
     PostSchema,
     PersonalInformationSchema,
 )
+from src.models.schemas.guide import GuideSchema
 from src.models.tables.users import UserTable
 
 
@@ -135,4 +137,19 @@ class PersonalInformationTable(BaseTable):
             content_type=self.content_type,
             content=self.content,
             post=self.post.to_schema_model(load_category=load_category, load_subcategory=load_subcategory) if load_post else None,
+        )
+
+
+class GuideTable(BaseTable):
+    __tablename__ = "guide"
+
+    id: Mapped[int_pk]
+    name: Mapped[str_128]
+    content: Mapped[str]
+
+    def to_schema_model(self) -> BaseModel:
+        return GuideSchema(
+            id=self.id,
+            name=self.name,
+            content=self.content,
         )
