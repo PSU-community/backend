@@ -13,7 +13,7 @@ class RuSenderRepository(EmailSenderRepository):
         payload = {
             "mail": {
                 "to": {"email": target_email, "name": "user"},
-                "from": {"email": "noreply@damego.ru", "name": "PSU Psycho Support"},
+                "from": {"email": "no-reply@damego.ru", "name": "Стобой"},
                 "subject": email.title,
                 "html": email.text,
             }
