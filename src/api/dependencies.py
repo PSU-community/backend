@@ -5,6 +5,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError, ExpiredSignatureError
 
 from src.services.guide import GuideService
+from src.services.tests import TestsService
 
 from .auth import TokenData, TokenTypes
 from ..api import auth, exceptions
@@ -34,6 +35,10 @@ def get_email_service():
 
 def get_guide_service():
     return GuideService()
+
+
+def get_tests_service():
+    return TestsService()
 
 
 def get_current_token_data(
@@ -124,6 +129,7 @@ async def validate_user_create(
 IUserService = Annotated[UserService, Depends(get_user_service)]
 IContentService = Annotated[ContentService, Depends(get_content_service)]
 GuideServiceDep = Annotated[GuideService, Depends(get_guide_service)]
+TestsServiceDep = Annotated[TestsService, Depends(get_tests_service)]
 
 ICurrentUser = Annotated[UserSchema, Depends(get_current_user(TokenTypes.ACCESS))]
 

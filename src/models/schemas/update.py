@@ -3,6 +3,7 @@ from typing import Optional, Any
 from pydantic import BaseModel, Field
 
 from src.models.enums import UserPermissions
+from src.models.schemas.tests import TestQuestion, TestResult
 
 
 class CategoryUpdate(BaseModel):
@@ -37,3 +38,9 @@ class UserContentUpdate(BaseModel):
 
 class GuideUpdate(BaseModel):
     content: str
+
+
+class TestUpdate(BaseModel):
+    name: str
+    questions: list[TestQuestion]
+    results: list[TestResult]

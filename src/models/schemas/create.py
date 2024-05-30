@@ -3,6 +3,7 @@ from typing import Optional, Any
 from pydantic import BaseModel, Field
 
 from src.models.enums import MediaTypes, PersonalInformationTypes
+from src.models.schemas.tests import TestQuestion, TestResult
 
 
 class CategoryCreate(BaseModel):
@@ -40,3 +41,23 @@ class CreateMediaSchema(RequestMediaSchema):
 class GuideCreate(BaseModel):
     name: str
     content: str
+
+
+class TestCreate(BaseModel):
+    name: str
+    questions: list[TestQuestion]
+    results: list[TestResult]
+
+
+class UserTestResultAnswer(BaseModel):
+    question_id: int
+    answer_id: int
+
+
+class UserTestResultRequest(BaseModel):
+    answers: list[UserTestResultAnswer]
+
+
+class UserTestResultCreate(UserTestResultRequest):
+    test_id: int
+    user_id: int
